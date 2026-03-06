@@ -50,6 +50,9 @@ app.get('/pagare', (req, res) => {
 app.get('/aforo', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'aforo.html'));
 });
+app.get('/customer-management', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'customer-management.html'));
+});
 
 // Catch-all -> home
 app.get('*', (req, res) => {
