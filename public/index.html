@@ -82,6 +82,21 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
   transition: padding 0.28s;
   justify-content: flex-start;
 }
+/* === SIDEBAR COLLAPSED FIXES === */
+.sidebar:not(:hover) .sidebar-logo img {
+  width: 36px !important;
+  height: auto !important;
+  object-fit: contain;
+}
+.sidebar:not(:hover) .nav-item {
+  justify-content: center;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.sidebar:not(:hover) .nav-icon {
+  margin: 0 auto;
+}
+
 /* nav-item: center icon when collapsed, left-align when expanded */
 .sidebar .nav-item {
   justify-content: flex-start;
@@ -339,6 +354,20 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
             <div class="tool-card-name">Aforo de Garantía</div>
             <div class="tool-card-desc">Calcula el aforo requerido para una garantía hipotecaria según las políticas de Proaktiva. Resultado en tiempo real.</div>
             <div class="tool-card-tag calc">⚡ Cálculo instantáneo</div>
+            <div class="tool-card-arrow">→</div>
+          </div>
+          <div class="tool-card" onclick="window.location.href='/calc.html'">
+            <div class="tool-card-icon blue">🧮</div>
+            <div class="tool-card-name">Calculadora de Crédito</div>
+            <div class="tool-card-desc">Calcula pagos mensuales, intereses y tablas de amortización bajo distintos esquemas de crédito.</div>
+            <div class="tool-card-tag calc">⚡ Cálculo instantáneo</div>
+            <div class="tool-card-arrow">→</div>
+          </div>
+          <div class="tool-card" onclick="window.location.href='/bitacora.html'">
+            <div class="tool-card-icon gold">📒</div>
+            <div class="tool-card-name">Bitácora de Gestiones</div>
+            <div class="tool-card-desc">Registra y da seguimiento a las gestiones de cobranza. Carga archivos Excel, filtra y exporta datos.</div>
+            <div class="tool-card-tag ai">✦ Gestión integral</div>
             <div class="tool-card-arrow">→</div>
           </div>
         </div>

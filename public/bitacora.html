@@ -75,6 +75,21 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
   transition: padding 0.28s;
   justify-content: flex-start;
 }
+/* === SIDEBAR COLLAPSED FIXES === */
+.sidebar:not(:hover) .sidebar-logo img {
+  width: 36px !important;
+  height: auto !important;
+  object-fit: contain;
+}
+.sidebar:not(:hover) .nav-item {
+  justify-content: center;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.sidebar:not(:hover) .nav-icon {
+  margin: 0 auto;
+}
+
 /* nav-item: center icon when collapsed, left-align when expanded */
 .sidebar .nav-item {
   justify-content: flex-start;
@@ -1185,10 +1200,9 @@ function getMonthKey(dateStr) {
 async function parseXLSX(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = async (e) => {
+    reader.onload = (e) => {
       try {
-        const XLSX = await import("https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs");
-        const wb = XLSX.read(e.target.result, { type: "array", cellDates: true });
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array", cellDates: true });
         const ws = wb.Sheets[wb.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
         resolve(data);
@@ -1202,7 +1216,6 @@ async function parseXLSX(file) {
 }
 
 async function exportToXLSX(gestiones, filename) {
-  const XLSX = await import("https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs");
   const headers = [
     "Folio Cliente", "Fecha de Gestión", "Ejecutivo", "Cliente", "Clasificación",
     "Reincidente", "Etapa", "Monto en Impago", "Área Responsable", "Saldo Neto",

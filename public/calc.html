@@ -73,6 +73,21 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
   transition: padding 0.28s;
   justify-content: flex-start;
 }
+/* === SIDEBAR COLLAPSED FIXES === */
+.sidebar:not(:hover) .sidebar-logo img {
+  width: 36px !important;
+  height: auto !important;
+  object-fit: contain;
+}
+.sidebar:not(:hover) .nav-item {
+  justify-content: center;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+.sidebar:not(:hover) .nav-icon {
+  margin: 0 auto;
+}
+
 /* nav-item: center icon when collapsed, left-align when expanded */
 .sidebar .nav-item {
   justify-content: flex-start;
