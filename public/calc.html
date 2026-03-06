@@ -1036,6 +1036,7 @@ function tipoLabel(t) { return {frances:'Capital Creciente',aleman:'Capital Fijo
 
 // ── EXPORT PDF ─────────────────────────────────────────────────────────────
 function exportPDF() {
+  try {
   if (!tablaData.length) return;
   if (!window.jspdf) { alert('PDF no disponible aún, espera un momento.'); return; }
   var { jsPDF } = window.jspdf;
@@ -1066,8 +1067,8 @@ function exportPDF() {
   var spread = parseFloat(document.getElementById('inp-spread').value)||0;
   var plazo = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
   var periodo = document.getElementById('inp-periodo-interes').value;
-  var periodoCap = document.getElementById('inp-periodo-capital').value;
-  var graceMeses = parseInt(document.getElementById('inp-grace').value) || 0;
+  var periodoCap = document.getElementById('inp-periodo-capital').value || 'igual';
+  var graceMeses = parseInt(document.getElementById('inp-grace').value, 10) || 0;
 
   doc.setFillColor(235,242,252); doc.rect(mL,y,cW,18,'F');
   doc.setFontSize(8); doc.setTextColor(30,50,100); doc.setFont('helvetica','normal');
