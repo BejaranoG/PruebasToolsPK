@@ -543,7 +543,7 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
               <!-- Monto -->
               <div class="field-group">
                 <div class="field-label">Monto del crédito (MXN)</div>
-                <input type="text" id="inp-monto" class="calc-input" placeholder="$0.00" oninput="fmtMoney(this)" />
+                <input type="text" id="inp-monto" class="calc-input" placeholder="$0.00" oninput="fmtMoney(this)" onblur="fmtMoneyBlur(this)" onfocus="fmtMoneyFocus(this)" />
               </div>
 
               <!-- Tasa -->
@@ -663,7 +663,7 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
                   </div>
                   <div class="cmp-field">
                     <div class="cmp-label">Monto (MXN)</div>
-                    <input type="text" id="cmp-monto-a" class="calc-input" placeholder="$0.00" oninput="fmtMoney(this)">
+                    <input type="text" id="cmp-monto-a" class="calc-input" placeholder="$0.00" oninput="fmtMoney(this)" onblur="fmtMoneyBlur(this)" onfocus="fmtMoneyFocus(this)">
                   </div>
                   <div class="cmp-field">
                     <div class="cmp-label">Tasa de interés anual</div>
@@ -726,7 +726,7 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
                   </div>
                   <div class="cmp-field">
                     <div class="cmp-label">Monto (MXN)</div>
-                    <input type="text" id="cmp-monto-b" class="calc-input" placeholder="$0.00" oninput="fmtMoney(this)">
+                    <input type="text" id="cmp-monto-b" class="calc-input" placeholder="$0.00" oninput="fmtMoney(this)" onblur="fmtMoneyBlur(this)" onfocus="fmtMoneyFocus(this)">
                   </div>
                   <div class="cmp-field">
                     <div class="cmp-label">Tasa de interés anual</div>
@@ -807,8 +807,27 @@ function parseMoney(s) {
   return parseFloat(String(s).replace(/[^0-9.]/g,'')) || 0;
 }
 function fmtMoney(inp) {
+  // Only clean up non-numeric chars while typing — no auto-formatting mid-input
+  var pos = inp.selectionStart;
+  var prev = inp.value;
+  var clean = prev.replace(/[^0-9.]/g, '');
+  // Allow only one decimal point
+  var parts = clean.split('.');
+  if (parts.length > 2) clean = parts[0] + '.' + parts.slice(1).join('');
+  if (inp.value !== clean) {
+    inp.value = clean;
+    inp.setSelectionRange(pos - (prev.length - clean.length), pos - (prev.length - clean.length));
+  }
+}
+function fmtMoneyBlur(inp) {
   var raw = parseMoney(inp.value);
   if (!isNaN(raw) && raw > 0) inp.value = '$' + raw.toLocaleString('es-MX', {minimumFractionDigits:2});
+  else if (!raw) inp.value = '';
+}
+function fmtMoneyFocus(inp) {
+  // Strip formatting on focus so user can edit raw number
+  var raw = parseMoney(inp.value);
+  inp.value = raw > 0 ? String(raw) : '';
 }
 function addDate(date, n, periodo) {
   var d = new Date(date);
