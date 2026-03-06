@@ -280,6 +280,15 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
 .tiie-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center; }
 .tiie-plus { font-size: 16px; color: var(--calc-muted); text-align: center; font-weight: 300; }
 .tiie-hint { font-size: 10.5px; color: var(--calc-muted); margin-top: 2px; }
+.rate-auto-card { border: 1px solid var(--calc-border); border-radius: 10px; background: #f8fbff; padding: 12px 14px; }
+.rate-auto-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.rate-auto-label { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--calc-muted); }
+.rate-auto-value { font-size: 20px; font-weight: 700; color: var(--calc-blue); font-family: "IBM Plex Mono", monospace; }
+.rate-auto-total { font-size: 12px; color: var(--calc-ink); font-weight: 600; margin-top: 4px; }
+.rate-badge { display:inline-flex; align-items:center; justify-content:center; min-height:24px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+.rate-badge.loading { background:#eef3f8; color:var(--calc-muted); }
+.rate-badge.ok { background:#e6f6ed; color:var(--calc-green); }
+.rate-badge.error { background:#fdecec; color:var(--calc-red); }
 
 /* ── AMORT TYPE ── */
 .amort-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
@@ -549,18 +558,24 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
               <!-- Tasa -->
               <div class="field-group">
                 <div class="field-label">Tasa de interés anual</div>
-                <div class="tiie-row">
+                <div class="field-group" style="gap:8px">
                   <div>
-                    <input type="number" id="inp-tiie" class="calc-input" placeholder="TIIE" step="0.01" min="0" max="50" />
-                    <div class="tiie-hint">TIIE 28d (%)</div>
+                    <select id="inp-destino" class="calc-input calc-select">
+                      <option value="pyme">PyME</option>
+                      <option value="agro">Agro</option>
+                    </select>
+                    <div class="tiie-hint">Destino del crédito</div>
                   </div>
-                  <div class="tiie-plus">+</div>
-                  <div>
-                    <input type="number" id="inp-spread" class="calc-input" placeholder="Spread" step="0.01" min="0" max="30" />
-                    <div class="tiie-hint">Puntos adicionales</div>
+                  <div class="rate-auto-card">
+                    <div class="rate-auto-line">
+                      <span class="rate-auto-label">TIIE 28d Banxico</span>
+                      <span id="tiie-status-badge" class="rate-badge loading">Cargando…</span>
+                    </div>
+                    <div id="tiie-auto-display" class="rate-auto-value">—</div>
+                    <div id="tasa-total-display" class="rate-auto-total"></div>
+                    <div id="tiie-source-display" class="tiie-hint">Fuente: Banco de México</div>
                   </div>
                 </div>
-                <div id="tasa-total-display" style="font-size:12px;color:var(--calc-blue);font-weight:600;margin-top:2px"></div>
               </div>
 
               <!-- Plazo y periodicidad -->
@@ -694,10 +709,12 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
                   </div>
                   <div class="cmp-field">
                     <div class="cmp-label">Tasa de interés anual</div>
-                    <div class="cmp-row3">
-                      <div><input type="number" id="cmp-tiie-a" class="calc-input" placeholder="TIIE" step="0.01" oninput="updateTasaDisplay('a')"><div class="cmp-hint">TIIE 28d (%)</div></div>
-                      <div class="cmp-plus">+</div>
-                      <div><input type="number" id="cmp-spread-a" class="calc-input" placeholder="Spread" step="0.01" oninput="updateTasaDisplay('a')"><div class="cmp-hint">Puntos</div></div>
+                    <div>
+                      <select id="cmp-destino-a" class="calc-input calc-select" onchange="updateTasaDisplay('a')">
+                        <option value="pyme">PyME</option>
+                        <option value="agro">Agro</option>
+                      </select>
+                      <div class="cmp-hint">Destino del crédito</div>
                     </div>
                     <div class="cmp-tasa-display" id="cmp-tasa-display-a"></div>
                   </div>
@@ -757,10 +774,12 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
                   </div>
                   <div class="cmp-field">
                     <div class="cmp-label">Tasa de interés anual</div>
-                    <div class="cmp-row3">
-                      <div><input type="number" id="cmp-tiie-b" class="calc-input" placeholder="TIIE" step="0.01" oninput="updateTasaDisplay('b')"><div class="cmp-hint">TIIE 28d (%)</div></div>
-                      <div class="cmp-plus">+</div>
-                      <div><input type="number" id="cmp-spread-b" class="calc-input" placeholder="Spread" step="0.01" oninput="updateTasaDisplay('b')"><div class="cmp-hint">Puntos</div></div>
+                    <div>
+                      <select id="cmp-destino-b" class="calc-input calc-select" onchange="updateTasaDisplay('b')">
+                        <option value="pyme">PyME</option>
+                        <option value="agro">Agro</option>
+                      </select>
+                      <div class="cmp-hint">Destino del crédito</div>
                     </div>
                     <div class="cmp-tasa-display" id="cmp-tasa-display-b"></div>
                   </div>
@@ -882,15 +901,74 @@ function setAmort(a, el) {
   document.getElementById('field-periodo-capital').style.display = isBullet ? 'none' : '';
 }
 
-// Live tasa display
-document.addEventListener('input', function(e) {
-  if (e.target.id === 'inp-tiie' || e.target.id === 'inp-spread') {
-    var tiie = parseFloat(document.getElementById('inp-tiie').value) || 0;
-    var spread = parseFloat(document.getElementById('inp-spread').value) || 0;
-    var total = tiie + spread;
-    var el = document.getElementById('tasa-total-display');
-    el.textContent = total > 0 ? 'Tasa total: ' + total.toFixed(4) + '% anual' : '';
+// ── TIIE AUTOMÁTICA ───────────────────────────────────────────────────────
+var CURRENT_TIIE_28 = null;
+var CURRENT_TIIE_DATE = '';
+var TIIE_SPREADS = { pyme: 16.40, agro: 15.40 };
+
+function getDestinoLabel(destino) {
+  return destino === 'agro' ? 'Agro' : 'PyME';
+}
+function getSpreadByDestino(destino) {
+  return TIIE_SPREADS[destino] || TIIE_SPREADS.pyme;
+}
+function getCurrentTiieValue() {
+  return typeof CURRENT_TIIE_28 === 'number' && !isNaN(CURRENT_TIIE_28) ? CURRENT_TIIE_28 : 0;
+}
+function getRateSummary(destino) {
+  var tiie = getCurrentTiieValue();
+  var spread = getSpreadByDestino(destino);
+  return { tiie: tiie, spread: spread, total: tiie + spread };
+}
+function setTiieBadge(text, cls) {
+  var badge = document.getElementById('tiie-status-badge');
+  if (!badge) return;
+  badge.className = 'rate-badge ' + cls;
+  badge.textContent = text;
+}
+function refreshMainRateDisplay() {
+  var destino = document.getElementById('inp-destino').value;
+  var info = getRateSummary(destino);
+  var tiieEl = document.getElementById('tiie-auto-display');
+  var totalEl = document.getElementById('tasa-total-display');
+  var sourceEl = document.getElementById('tiie-source-display');
+  tiieEl.textContent = info.tiie ? info.tiie.toFixed(4) + '%' : '—';
+  totalEl.textContent = info.tiie ? (getDestinoLabel(destino) + ': TIIE ' + info.tiie.toFixed(4) + '% + ' + info.spread.toFixed(2) + ' pts = ' + info.total.toFixed(4) + '% anual') : 'No se pudo cargar la TIIE 28 automáticamente.';
+  sourceEl.textContent = CURRENT_TIIE_DATE ? ('Fuente: Banco de México · publicación ' + CURRENT_TIIE_DATE) : 'Fuente: Banco de México';
+}
+function updateTasaDisplay(sc) {
+  var destino = document.getElementById('cmp-destino-' + sc).value;
+  var info = getRateSummary(destino);
+  var el = document.getElementById('cmp-tasa-display-' + sc);
+  el.textContent = info.tiie ? ('TIIE ' + info.tiie.toFixed(4) + '% + ' + info.spread.toFixed(2) + ' pts (' + getDestinoLabel(destino) + ') = ' + info.total.toFixed(4) + '% anual') : 'TIIE 28 no disponible';
+}
+async function fetchTiie28() {
+  setTiieBadge('Cargando…', 'loading');
+  try {
+    var res = await fetch('https://www.banxico.org.mx/rsscb/rss?BMXC_canal=tiie&BMXC_idioma=es', { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var xmlText = await res.text();
+    var docXml = new DOMParser().parseFromString(xmlText, 'text/xml');
+    var text = docXml.documentElement ? docXml.documentElement.textContent : xmlText;
+    var dateMatch = text.match(/(\d{4}-\d{2}-\d{2})/);
+    var tiieMatch = text.match(/TIIE28\s*([0-9]+\.[0-9]+)/i) || text.match(/TIIE\s*28\s*d[ií]as[^0-9]*([0-9]+\.[0-9]+)/i);
+    if (!tiieMatch) throw new Error('No se identificó la TIIE 28 en la respuesta de Banxico.');
+    CURRENT_TIIE_28 = parseFloat(tiieMatch[1]);
+    CURRENT_TIIE_DATE = dateMatch ? dateMatch[1] : '';
+    setTiieBadge('Actualizada', 'ok');
+  } catch (err) {
+    CURRENT_TIIE_28 = null;
+    CURRENT_TIIE_DATE = '';
+    setTiieBadge('Sin conexión', 'error');
+    console.error('No fue posible obtener la TIIE 28 desde Banxico:', err);
   }
+  refreshMainRateDisplay();
+  updateTasaDisplay('a');
+  updateTasaDisplay('b');
+}
+
+document.addEventListener('change', function(e) {
+  if (e.target.id === 'inp-destino') refreshMainRateDisplay();
 });
 
 // Set today as default date
@@ -898,13 +976,18 @@ document.addEventListener('input', function(e) {
   var d = new Date();
   var str = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   document.getElementById('inp-fecha').value = str;
+  refreshMainRateDisplay();
+  updateTasaDisplay('a');
+  updateTasaDisplay('b');
+  fetchTiie28();
 })();
 
 // ── MAIN CALC ─────────────────────────────────────────────────────────────
 function calcular() {
   var monto      = parseMoney(document.getElementById('inp-monto').value);
-  var tiie       = parseFloat(document.getElementById('inp-tiie').value)        || 0;
-  var spread     = parseFloat(document.getElementById('inp-spread').value)      || 0;
+  var destino    = document.getElementById('inp-destino').value;
+  var tiie       = getCurrentTiieValue();
+  var spread     = getSpreadByDestino(destino);
   var plazoRaw   = parseInt(document.getElementById('inp-plazo').value)         || 0;
   var unidad     = document.getElementById('inp-unidad').value;
   var periodoInt = document.getElementById('inp-periodo-interes').value;
@@ -916,7 +999,7 @@ function calcular() {
   var bulletStart= parseInt(document.getElementById('inp-bullet-start').value)  || 0;
 
   if (!monto || !plazoRaw || !(tiie+spread)) {
-    alert('Por favor completa: Monto, Tasa y Plazo.');
+    alert('Por favor completa: Monto, Plazo y verifica que la TIIE 28 haya cargado.');
     return;
   }
 
@@ -939,7 +1022,7 @@ function calcular() {
   var cat          = calcCAT(monto, tabla, tasaAnual, monto * apertura/100, anualFee);
 
   renderResults({
-    monto, tasaAnual, numPagos, periodo:periodoInt, periodoCap,
+    monto, tasaAnual, numPagos, periodo:periodoInt, periodoCap, destino, tiie, spread,
     totalPago, totalInteres, totalCapital,
     primerPago, cat, tipoAmort, tipoCredito, graceMeses
   }, tabla);
@@ -996,7 +1079,7 @@ function renderResults(kpis, tabla) {
   html += '<div class="table-card-header">';
   var graceInfo = kpis.graceMeses > 0 ? ' · Gracia: '+kpis.graceMeses+' meses' : '';
   var capInfo   = kpis.periodoCap && kpis.periodoCap !== 'igual' ? ' · Capital: '+kpis.periodoCap : '';
-  html += '<div class="table-card-title">📋 Tabla de amortización — ' + tipoLabel(tipoAmort) + graceInfo + capInfo + '</div>';
+  html += '<div class="table-card-title">📋 Tabla de amortización — ' + tipoLabel(tipoAmort) + ' · ' + getDestinoLabel(kpis.destino) + graceInfo + capInfo + '</div>';
   html += '<div class="export-btns">';
   html += '<button class="export-btn pdf" onclick="exportPDF()">⬇ PDF</button>';
   html += '<button class="export-btn excel" onclick="exportExcel()">⬇ Excel</button>';
@@ -1062,10 +1145,10 @@ function exportPDF() {
 
   // Params summary
   var monto = parseMoney(document.getElementById('inp-monto').value);
-  var tiie = parseFloat(document.getElementById('inp-tiie').value)||0;
-  var spread = parseFloat(document.getElementById('inp-spread').value)||0;
-  var unidadTxt = document.getElementById('inp-unidad').options[document.getElementById('inp-unidad').selectedIndex].text;
-  var plazo = document.getElementById('inp-plazo').value + ' ' + unidadTxt;
+  var destino = document.getElementById('inp-destino').value;
+  var tiie = getCurrentTiieValue();
+  var spread = getSpreadByDestino(destino);
+  var plazo = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
   var periodo = document.getElementById('inp-periodo-interes').value;
   var periodoCap = document.getElementById('inp-periodo-capital').value || 'igual';
   var graceMeses = parseInt(document.getElementById('inp-grace').value, 10) || 0;
@@ -1078,7 +1161,7 @@ function exportPDF() {
   doc.text(fmtMXN(monto), mL+2, y+13);
   doc.setFont('helvetica','bold');
   doc.text('Tasa anual:', mL+cols+2, y+6); doc.setFont('helvetica','normal');
-  doc.text('TIIE ' + tiie.toFixed(4) + '% + ' + spread.toFixed(4) + '% = ' + (tiie+spread).toFixed(4) + '%', mL+cols+2, y+13);
+  doc.text('Destino ' + getDestinoLabel(destino) + ' | TIIE ' + tiie.toFixed(4) + '% + ' + spread.toFixed(2) + ' pts = ' + (tiie+spread).toFixed(4) + '%', mL+cols+2, y+13);
   doc.setFont('helvetica','bold');
   doc.text('Plazo:', mL+cols*2+2, y+6); doc.setFont('helvetica','normal');
   doc.text(plazo, mL+cols*2+2, y+13);
@@ -1162,8 +1245,9 @@ function exportPDF() {
 function exportExcel() {
   if (!tablaData.length) return;
   var monto  = parseMoney(document.getElementById('inp-monto').value);
-  var tiie   = parseFloat(document.getElementById('inp-tiie').value)||0;
-  var spread = parseFloat(document.getElementById('inp-spread').value)||0;
+  var destino= document.getElementById('inp-destino').value;
+  var tiie   = getCurrentTiieValue();
+  var spread = getSpreadByDestino(destino);
   var plazo  = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
   var periodo= document.getElementById('inp-periodo-interes').value;
   var periodoCap = document.getElementById('inp-periodo-capital').value;
@@ -1177,8 +1261,9 @@ function exportExcel() {
     [],
     ['Tipo de crédito', tipoCredito],
     ['Monto', monto],
-    ['Tasa TIIE', tiie + '%'],
-    ['Spread', spread + '%'],
+    ['Destino', getDestinoLabel(destino)],
+    ['TIIE 28 Banxico', tiie + '%'],
+    ['Margen aplicado', spread + ' puntos'],
     ['Tasa total', (tiie+spread) + '%'],
     ['Plazo', plazo],
     ['Periodicidad', periodLabel(periodo)],
@@ -1211,15 +1296,6 @@ function setMode(mode) {
   document.getElementById('panel-modo-comparar').style.display = mode === 'comparar' ? '' : 'none';
   document.getElementById('btn-calcular').classList.toggle('active', mode === 'calcular');
   document.getElementById('btn-comparar').classList.toggle('active', mode === 'comparar');
-}
-
-// ── TASA DISPLAY FOR COMPARE ──────────────────────────────────────────────
-function updateTasaDisplay(sc) {
-  var tiie   = parseFloat(document.getElementById('cmp-tiie-' + sc).value)   || 0;
-  var spread = parseFloat(document.getElementById('cmp-spread-' + sc).value) || 0;
-  var total  = tiie + spread;
-  var el = document.getElementById('cmp-tasa-display-' + sc);
-  el.textContent = total > 0 ? 'Tasa total: ' + total.toFixed(4) + '% anual' : '';
 }
 
 // ── BUILD AMORT TABLE FOR COMPARE ─────────────────────────────────────────
@@ -1321,20 +1397,21 @@ function compararEscenarios() {
 
 function readScenario(sc) {
   var monto  = parseMoney(document.getElementById('cmp-monto-' + sc).value);
-  var tiie   = parseFloat(document.getElementById('cmp-tiie-' + sc).value)   || 0;
-  var spread = parseFloat(document.getElementById('cmp-spread-' + sc).value) || 0;
+  var destino= document.getElementById('cmp-destino-' + sc).value;
+  var tiie   = getCurrentTiieValue();
+  var spread = getSpreadByDestino(destino);
   var plazo  = parseInt(document.getElementById('cmp-plazo-' + sc).value)    || 0;
   var unidad = document.getElementById('cmp-unidad-' + sc).value;
   var periodo= document.getElementById('cmp-periodo-interes-' + sc) ? document.getElementById('cmp-periodo-interes-' + sc).value : document.getElementById('cmp-periodo-' + sc).value;
   var amort  = document.getElementById('cmp-amort-' + sc).value;
   if (!monto || !plazo || !(tiie+spread)) {
-    alert('Completa todos los campos del Escenario ' + sc.toUpperCase());
+    alert('Completa todos los campos del Escenario ' + sc.toUpperCase() + ' y verifica que la TIIE 28 esté disponible.');
     return null;
   }
   var periodoMap = {mensual:1,bimestral:2,trimestral:3,semestral:6,anual:12};
   var totalMeses = unidad === 'anios' ? plazo * 12 : plazo;
   var mesesInt   = periodoMap[periodo] || 1;
-  return {monto, tasaAnual:(tiie+spread)/100, tiie, spread, plazo, unidad, periodo,
+  return {monto, tasaAnual:(tiie+spread)/100, tiie, spread, destino, plazo, unidad, periodo,
           totalMeses, mesesInt, mesesCap:mesesInt, amort};
 }
 
