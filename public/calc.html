@@ -1080,7 +1080,7 @@ function exportPDF() {
   doc.text(fmtMXN(monto), mL+2, y+13);
   doc.setFont('helvetica','bold');
   doc.text('Tasa anual:', mL+cols+2, y+6); doc.setFont('helvetica','normal');
-  doc.text((tiie+spread).toFixed(4)+'%', mL+cols+2, y+13);
+  doc.text('TIIE ' + tiie.toFixed(4) + '% + ' + spread.toFixed(4) + '% = ' + (tiie+spread).toFixed(4) + '%', mL+cols+2, y+13);
   doc.setFont('helvetica','bold');
   doc.text('Plazo:', mL+cols*2+2, y+6); doc.setFont('helvetica','normal');
   doc.text(plazo, mL+cols*2+2, y+13);
