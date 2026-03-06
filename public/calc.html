@@ -1036,7 +1036,6 @@ function tipoLabel(t) { return {frances:'Capital Creciente',aleman:'Capital Fijo
 
 // ── EXPORT PDF ─────────────────────────────────────────────────────────────
 function exportPDF() {
-  try {
   if (!tablaData.length) return;
   if (!window.jspdf) { alert('PDF no disponible aún, espera un momento.'); return; }
   var { jsPDF } = window.jspdf;
