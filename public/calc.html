@@ -35,10 +35,48 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
 
 /* ── SIDEBAR ── */
 .sidebar {
-  width: 240px; min-width: 240px;
+  width: 58px; min-width: 58px;
   background: var(--dark);
   display: flex; flex-direction: column;
   height: 100vh; overflow-y: auto;
+  transition: width 0.28s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+  position: relative;
+  z-index: 10;
+  flex-shrink: 0;
+}
+.sidebar:hover {
+  width: 240px;
+}
+/* Hide text labels when collapsed */
+.sidebar .sidebar-logo-name,
+.sidebar .sidebar-logo-sub,
+.sidebar .sidebar-section,
+.sidebar .sidebar-footer,
+.sidebar .nav-badge,
+.sidebar .nav-item > span:not(.nav-icon) {
+  opacity: 0;
+  transition: opacity 0.18s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.sidebar:hover .sidebar-logo-name,
+.sidebar:hover .sidebar-logo-sub,
+.sidebar:hover .sidebar-section,
+.sidebar:hover .sidebar-footer,
+.sidebar:hover .nav-badge,
+.sidebar:hover .nav-item > span:not(.nav-icon) {
+  opacity: 1;
+}
+/* Logo area: center icon when collapsed */
+.sidebar .sidebar-logo {
+  transition: padding 0.28s;
+  justify-content: flex-start;
+}
+/* nav-item: center icon when collapsed, left-align when expanded */
+.sidebar .nav-item {
+  justify-content: flex-start;
+  padding-left: 14px;
 }
 .sidebar-logo {
   padding: 20px 12px 16px;
@@ -182,9 +220,6 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
 .sidebar-overlay.visible { display: block; }
 
 @media (max-width: 768px) {
-  .tiie-auto-card { grid-template-columns: 1fr; }
-  .tiie-auto-plus { display: none; }
-  .cmp-rate-grid { grid-template-columns: 1fr; }
   .hamburger-btn { display: flex; }
 
   .sidebar {
@@ -193,10 +228,13 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
     left: -260px;
     width: 240px !important; min-width: 240px !important;
     z-index: 200;
-    transition: left 0.25s ease;
+    transition: left 0.25s ease !important;
     overflow-y: auto;
   }
+  .sidebar:hover { width: 240px !important; }
   .sidebar.open { left: 0; }
+  .sidebar .sidebar-logo-name, .sidebar .sidebar-logo-sub, .sidebar .sidebar-section,
+  .sidebar .sidebar-footer, .sidebar .nav-badge, .sidebar .nav-item > span:not(.nav-icon) { opacity: 1; }
 
   .main { margin-left: 0 !important; }
 
@@ -283,25 +321,6 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
 .tiie-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: center; }
 .tiie-plus { font-size: 16px; color: var(--calc-muted); text-align: center; font-weight: 300; }
 .tiie-hint { font-size: 10.5px; color: var(--calc-muted); margin-top: 2px; }
-.tiie-auto-toolbar { display: flex; gap: 10px; align-items: center; }
-.tiie-refresh-btn { padding: 10px 12px; border: 1.5px solid var(--calc-blue); color: var(--calc-blue); background: #eef5fd; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: "IBM Plex Sans", sans-serif; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-.tiie-refresh-btn:hover { background: var(--calc-blue); color: #fff; }
-.tiie-auto-card { display: grid; grid-template-columns: 1fr auto 1fr 1fr; gap: 8px; align-items: stretch; }
-.tiie-auto-box { background: #f7fbff; border: 1px solid var(--calc-border); border-radius: 10px; padding: 10px 12px; min-height: 74px; display: flex; flex-direction: column; justify-content: center; }
-.tiie-auto-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--calc-muted); margin-bottom: 5px; }
-.tiie-auto-value { font-size: 17px; font-weight: 700; color: var(--calc-blue); font-family: "IBM Plex Mono", monospace; line-height: 1.1; }
-.tiie-auto-sub { font-size: 10.5px; color: var(--calc-muted); margin-top: 4px; }
-.tiie-auto-plus { display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 300; color: var(--calc-muted); }
-.tiie-status { font-size: 10.5px; color: var(--calc-muted); margin-top: 4px; min-height: 14px; }
-.cmp-rate-stack { display: flex; flex-direction: column; gap: 8px; }
-.cmp-rate-toolbar { display: flex; gap: 8px; align-items: center; }
-.cmp-rate-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: stretch; }
-.cmp-rate-box { background: #f7fbff; border: 1px solid var(--calc-border); border-radius: 8px; padding: 9px 10px; min-height: 72px; display: flex; flex-direction: column; justify-content: center; }
-.cmp-rate-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--calc-muted); margin-bottom: 4px; }
-.cmp-rate-value { font-size: 13px; font-weight: 700; color: var(--calc-blue); font-family: "IBM Plex Mono", monospace; line-height: 1.1; }
-.cmp-rate-sub { font-size: 10px; color: var(--calc-muted); margin-top: 4px; }
-.cmp-refresh-btn { padding: 9px 10px; border: 1.5px solid var(--calc-blue); color: var(--calc-blue); background: #eef5fd; border-radius: 8px; font-size: 11px; font-weight: 600; font-family: "IBM Plex Sans", sans-serif; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
-.cmp-refresh-btn:hover { background: var(--calc-blue); color: #fff; }
 
 /* ── AMORT TYPE ── */
 .amort-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
@@ -500,6 +519,10 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
       <div class="nav-icon">🧮</div>
       <span>Calculadora de Crédito</span>
     </div>
+    <div class="nav-item" id="nav-bitacora" onclick="window.location.href='/bitacora.html'">
+      <div class="nav-icon">📒</div>
+      <span>Bitácora de Gestiones</span>
+    </div>
 
     <div class="sidebar-spacer"></div>
     <div class="sidebar-footer">ToolsPK v1.0 · Proaktiva</div>
@@ -571,37 +594,18 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
               <!-- Tasa -->
               <div class="field-group">
                 <div class="field-label">Tasa de interés anual</div>
-                <div class="tiie-auto-toolbar field-row" style="grid-template-columns:1fr auto">
+                <div class="tiie-row">
                   <div>
-                    <select id="inp-destino" class="calc-input calc-select" onchange="applyDestinoConfig('main')">
-                      <option value="pyme">PyME</option>
-                      <option value="agro">Agro</option>
-                    </select>
-                    <div class="tiie-hint">Selecciona el destino y la calculadora aplicará el margen correspondiente</div>
+                    <input type="number" id="inp-tiie" class="calc-input" placeholder="TIIE" step="0.01" min="0" max="50" />
+                    <div class="tiie-hint">TIIE 28d (%)</div>
                   </div>
-                  <button type="button" class="tiie-refresh-btn" onclick="refreshTiie(true)">↻ Actualizar TIIE</button>
-                </div>
-                <div class="tiie-auto-card">
-                  <div class="tiie-auto-box">
-                    <div class="tiie-auto-label">TIIE 28</div>
-                    <div class="tiie-auto-value" id="tiie-valor-display">—</div>
-                    <div class="tiie-auto-sub" id="tiie-fecha-display">DOF</div>
-                  </div>
-                  <div class="tiie-auto-plus">+</div>
-                  <div class="tiie-auto-box">
-                    <div class="tiie-auto-label">Margen</div>
-                    <div class="tiie-auto-value" id="spread-display">16.40 pts</div>
-                    <div class="tiie-auto-sub" id="destino-display">PyME</div>
-                  </div>
-                  <div class="tiie-auto-box">
-                    <div class="tiie-auto-label">Tasa total</div>
-                    <div class="tiie-auto-value" id="tasa-total-display">—</div>
-                    <div class="tiie-auto-sub">Anual</div>
+                  <div class="tiie-plus">+</div>
+                  <div>
+                    <input type="number" id="inp-spread" class="calc-input" placeholder="Spread" step="0.01" min="0" max="30" />
+                    <div class="tiie-hint">Puntos adicionales</div>
                   </div>
                 </div>
-                <div class="tiie-status" id="tiie-status">Pendiente de consultar la TIIE vigente del DOF.</div>
-                <input type="hidden" id="inp-tiie" value="">
-                <input type="hidden" id="inp-spread" value="16.40">
+                <div id="tasa-total-display" style="font-size:12px;color:var(--calc-blue);font-weight:600;margin-top:2px"></div>
               </div>
 
               <!-- Plazo y periodicidad -->
@@ -734,32 +738,13 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
                     <input type="text" id="cmp-monto-a" class="calc-input" placeholder="$0.00" oninput="fmtMoney(this)" onblur="fmtMoneyBlur(this)" onfocus="fmtMoneyFocus(this)">
                   </div>
                   <div class="cmp-field">
-                    <div class="cmp-label">Tasa automática</div>
-                    <div class="cmp-rate-stack">
-                      <div class="cmp-rate-toolbar">
-                        <select id="cmp-destino-a" class="calc-input calc-select" onchange="applyDestinoConfig('a')">
-                          <option value="pyme">PyME</option>
-                          <option value="agro">Agro</option>
-                        </select>
-                        <button type="button" class="cmp-refresh-btn" onclick="refreshTiie(true)">↻ TIIE</button>
-                      </div>
-                      <div class="cmp-rate-grid">
-                        <div class="cmp-rate-box">
-                          <div class="cmp-rate-label">TIIE 28</div>
-                          <div class="cmp-rate-value" id="cmp-tiie-valor-a">—</div>
-                          <div class="cmp-rate-sub" id="cmp-tiie-fecha-a">DOF</div>
-                        </div>
-                        <div class="cmp-plus">+</div>
-                        <div class="cmp-rate-box">
-                          <div class="cmp-rate-label">Margen</div>
-                          <div class="cmp-rate-value" id="cmp-spread-display-a">16.40 pts</div>
-                          <div class="cmp-rate-sub" id="cmp-destino-display-a">PyME</div>
-                        </div>
-                      </div>
+                    <div class="cmp-label">Tasa de interés anual</div>
+                    <div class="cmp-row3">
+                      <div><input type="number" id="cmp-tiie-a" class="calc-input" placeholder="TIIE" step="0.01" oninput="updateTasaDisplay('a')"><div class="cmp-hint">TIIE 28d (%)</div></div>
+                      <div class="cmp-plus">+</div>
+                      <div><input type="number" id="cmp-spread-a" class="calc-input" placeholder="Spread" step="0.01" oninput="updateTasaDisplay('a')"><div class="cmp-hint">Puntos</div></div>
                     </div>
                     <div class="cmp-tasa-display" id="cmp-tasa-display-a"></div>
-                    <input type="hidden" id="cmp-tiie-a" value="">
-                    <input type="hidden" id="cmp-spread-a" value="16.40">
                   </div>
                   <div class="cmp-row2">
                     <div class="cmp-field">
@@ -816,32 +801,13 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
                     <input type="text" id="cmp-monto-b" class="calc-input" placeholder="$0.00" oninput="fmtMoney(this)" onblur="fmtMoneyBlur(this)" onfocus="fmtMoneyFocus(this)">
                   </div>
                   <div class="cmp-field">
-                    <div class="cmp-label">Tasa automática</div>
-                    <div class="cmp-rate-stack">
-                      <div class="cmp-rate-toolbar">
-                        <select id="cmp-destino-b" class="calc-input calc-select" onchange="applyDestinoConfig('b')">
-                          <option value="pyme">PyME</option>
-                          <option value="agro">Agro</option>
-                        </select>
-                        <button type="button" class="cmp-refresh-btn" onclick="refreshTiie(true)">↻ TIIE</button>
-                      </div>
-                      <div class="cmp-rate-grid">
-                        <div class="cmp-rate-box">
-                          <div class="cmp-rate-label">TIIE 28</div>
-                          <div class="cmp-rate-value" id="cmp-tiie-valor-b">—</div>
-                          <div class="cmp-rate-sub" id="cmp-tiie-fecha-b">DOF</div>
-                        </div>
-                        <div class="cmp-plus">+</div>
-                        <div class="cmp-rate-box">
-                          <div class="cmp-rate-label">Margen</div>
-                          <div class="cmp-rate-value" id="cmp-spread-display-b">16.40 pts</div>
-                          <div class="cmp-rate-sub" id="cmp-destino-display-b">PyME</div>
-                        </div>
-                      </div>
+                    <div class="cmp-label">Tasa de interés anual</div>
+                    <div class="cmp-row3">
+                      <div><input type="number" id="cmp-tiie-b" class="calc-input" placeholder="TIIE" step="0.01" oninput="updateTasaDisplay('b')"><div class="cmp-hint">TIIE 28d (%)</div></div>
+                      <div class="cmp-plus">+</div>
+                      <div><input type="number" id="cmp-spread-b" class="calc-input" placeholder="Spread" step="0.01" oninput="updateTasaDisplay('b')"><div class="cmp-hint">Puntos</div></div>
                     </div>
                     <div class="cmp-tasa-display" id="cmp-tasa-display-b"></div>
-                    <input type="hidden" id="cmp-tiie-b" value="">
-                    <input type="hidden" id="cmp-spread-b" value="16.40">
                   </div>
                   <div class="cmp-row2">
                     <div class="cmp-field">
@@ -961,156 +927,22 @@ function setAmort(a, el) {
   document.getElementById('field-periodo-capital').style.display = isBullet ? 'none' : '';
 }
 
-// ── TIIE AUTOMÁTICA DESDE DOF ─────────────────────────────────────────────
-var tiieState = { value: 0, date: '', source: '', loading: false };
-
-function destinoLabel(destino) {
-  return ({pyme:'PyME', agro:'Agro'})[destino] || 'PyME';
-}
-function destinoSpread(destino) {
-  return destino === 'agro' ? 15.40 : 16.40;
-}
-function capitalPeriodLabel(p) {
-  return ({igual:'Igual que interés', mensual:'Mensual', trimestral:'Trimestral', semestral:'Semestral', anual:'Anual', bullet:'Bullet (al vencimiento)'})[p] || p;
-}
-function getSelectedText(id) {
-  var el = document.getElementById(id);
-  if (!el) return '';
-  var opt = el.options && el.selectedIndex >= 0 ? el.options[el.selectedIndex] : null;
-  return opt ? opt.text : el.value;
-}
-function updateMainTasaDisplay() {
-  var tiie = parseFloat(document.getElementById('inp-tiie').value) || 0;
-  var spread = parseFloat(document.getElementById('inp-spread').value) || 0;
-  var total = tiie + spread;
-  var destino = document.getElementById('inp-destino').value;
-  var totalEl = document.getElementById('tasa-total-display');
-  if (totalEl) totalEl.textContent = total > 0 ? total.toFixed(4) + '%' : '—';
-  var spreadEl = document.getElementById('spread-display');
-  if (spreadEl) spreadEl.textContent = spread.toFixed(2) + ' pts';
-  var destEl = document.getElementById('destino-display');
-  if (destEl) destEl.textContent = destinoLabel(destino);
-}
-function updateTasaDisplay(sc) {
-  var tiie = parseFloat(document.getElementById('cmp-tiie-' + sc).value) || 0;
-  var spread = parseFloat(document.getElementById('cmp-spread-' + sc).value) || 0;
-  var total = tiie + spread;
-  var destino = document.getElementById('cmp-destino-' + sc).value;
-  var totalEl = document.getElementById('cmp-tasa-display-' + sc);
-  if (totalEl) totalEl.textContent = total > 0 ? 'Tasa total: ' + total.toFixed(4) + '% anual' : 'Tasa total: —';
-  var spreadEl = document.getElementById('cmp-spread-display-' + sc);
-  if (spreadEl) spreadEl.textContent = spread.toFixed(2) + ' pts';
-  var destEl = document.getElementById('cmp-destino-display-' + sc);
-  if (destEl) destEl.textContent = destinoLabel(destino);
-}
-function applyDestinoConfig(scope) {
-  var isMain = scope === 'main';
-  var destId = isMain ? 'inp-destino' : 'cmp-destino-' + scope;
-  var spreadId = isMain ? 'inp-spread' : 'cmp-spread-' + scope;
-  var destEl = document.getElementById(destId);
-  var spreadEl = document.getElementById(spreadId);
-  if (!destEl || !spreadEl) return;
-  spreadEl.value = destinoSpread(destEl.value).toFixed(2);
-  if (isMain) updateMainTasaDisplay(); else updateTasaDisplay(scope);
-}
-function saveTiieCache(data) {
-  try { localStorage.setItem('toolspk_tiie_cache_v1', JSON.stringify(data)); } catch (e) {}
-}
-function loadTiieCache() {
-  try {
-    var raw = localStorage.getItem('toolspk_tiie_cache_v1');
-    return raw ? JSON.parse(raw) : null;
-  } catch (e) { return null; }
-}
-function setTiieValue(value, dateText, sourceText, fromCache) {
-  var tiie = Number(value);
-  if (!isFinite(tiie) || tiie <= 0) return;
-  ['inp-tiie','cmp-tiie-a','cmp-tiie-b'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) el.value = tiie.toFixed(4);
-  });
-  tiieState.value = tiie;
-  tiieState.date = dateText || '';
-  tiieState.source = sourceText || 'DOF';
-  [['tiie-valor-display','tiie-fecha-display'],['cmp-tiie-valor-a','cmp-tiie-fecha-a'],['cmp-tiie-valor-b','cmp-tiie-fecha-b']].forEach(function(pair) {
-    var valueEl = document.getElementById(pair[0]);
-    var dateEl = document.getElementById(pair[1]);
-    if (valueEl) valueEl.textContent = tiie.toFixed(4) + '%';
-    if (dateEl) dateEl.textContent = dateText ? 'DOF al ' + dateText : 'DOF';
-  });
-  updateMainTasaDisplay();
-  updateTasaDisplay('a');
-  updateTasaDisplay('b');
-  var statusEl = document.getElementById('tiie-status');
-  if (statusEl) statusEl.textContent = (fromCache ? 'Se cargó el último valor guardado' : 'TIIE actualizada correctamente') + (dateText ? ' (' + dateText + ')' : '') + '.';
-}
-function parseTiiePayload(text) {
-  if (!text) return null;
-  var normalized = String(text).replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ');
-  var rateMatch = normalized.match(/TIIE\s*28\s*D[IÍ]AS?\s*([0-9]+(?:\.[0-9]+)?)/i)
-    || normalized.match(/TIIE\s*(?:a\s*plazo\s*de\s*)?28\s*d[ií]as?.{0,160}?fue\s*de\s*([0-9]+(?:\.[0-9]+)?)/i);
-  if (!rateMatch) return null;
-  var dateMatch = normalized.match(/Tipo de Cambio y Tasas al\s*(\d{2}\/\d{2}\/\d{4})/i)
-    || normalized.match(/INDICADORES\.\s*Tipo de Cambio y Tasas al\s*(\d{2}\/\d{2}\/\d{4})/i)
-    || normalized.match(/al\s*(\d{2}\/\d{2}\/\d{4})/i);
-  return { value: parseFloat(rateMatch[1]), date: dateMatch ? dateMatch[1] : '' };
-}
-async function fetchTextWithTimeout(url, timeoutMs) {
-  var controller = new AbortController();
-  var timer = setTimeout(function() { controller.abort(); }, timeoutMs || 15000);
-  try {
-    var sep = url.indexOf('?') >= 0 ? '&' : '?';
-    var res = await fetch(url + sep + '_ts=' + Date.now(), { cache: 'no-store', signal: controller.signal });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    return await res.text();
-  } finally {
-    clearTimeout(timer);
+// Live tasa display
+document.addEventListener('input', function(e) {
+  if (e.target.id === 'inp-tiie' || e.target.id === 'inp-spread') {
+    var tiie = parseFloat(document.getElementById('inp-tiie').value) || 0;
+    var spread = parseFloat(document.getElementById('inp-spread').value) || 0;
+    var total = tiie + spread;
+    var el = document.getElementById('tasa-total-display');
+    el.textContent = total > 0 ? 'Tasa total: ' + total.toFixed(4) + '% anual' : '';
   }
-}
-async function refreshTiie(showAlert) {
-  if (tiieState.loading) return;
-  tiieState.loading = true;
-  var statusEl = document.getElementById('tiie-status');
-  if (statusEl) statusEl.textContent = 'Consultando TIIE 28 publicada por el DOF...';
-  var sources = [
-    { label: 'DOF indicadores', url: 'https://www.dof.gob.mx/indicadores.php' },
-    { label: 'DOF edición matutina', url: 'https://www.dof.gob.mx/index_113.php' },
-    { label: 'DOF indicadores (proxy texto)', url: 'https://r.jina.ai/http://www.dof.gob.mx/indicadores.php' },
-    { label: 'DOF edición matutina (proxy texto)', url: 'https://r.jina.ai/http://www.dof.gob.mx/index_113.php' }
-  ];
-  var lastErr = null;
-  for (var i = 0; i < sources.length; i++) {
-    try {
-      var text = await fetchTextWithTimeout(sources[i].url, 15000);
-      var parsed = parseTiiePayload(text);
-      if (parsed && parsed.value) {
-        setTiieValue(parsed.value, parsed.date, sources[i].label, false);
-        saveTiieCache({ value: parsed.value, date: parsed.date, source: sources[i].label, savedAt: new Date().toISOString() });
-        tiieState.loading = false;
-        if (showAlert) alert('TIIE actualizada correctamente.');
-        return;
-      }
-    } catch (err) {
-      lastErr = err;
-    }
-  }
-  tiieState.loading = false;
-  if (statusEl) statusEl.textContent = 'No fue posible recuperar la TIIE automáticamente en este momento. Se conserva el último valor disponible si existe.';
-  if (showAlert) alert('No fue posible recuperar la TIIE automáticamente desde el DOF en este momento.');
-  if (lastErr) console.warn('Error al recuperar TIIE:', lastErr);
-}
+});
 
-// Set defaults and bootstrap auto-rate
+// Set today as default date
 (function() {
   var d = new Date();
   var str = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   document.getElementById('inp-fecha').value = str;
-  applyDestinoConfig('main');
-  applyDestinoConfig('a');
-  applyDestinoConfig('b');
-  var cached = loadTiieCache();
-  if (cached && cached.value) setTiieValue(cached.value, cached.date, cached.source || 'cache', true);
-  refreshTiie(false);
 })();
 
 // ── MAIN CALC ─────────────────────────────────────────────────────────────
@@ -1129,7 +961,7 @@ function calcular() {
   var bulletStart= parseInt(document.getElementById('inp-bullet-start').value)  || 0;
 
   if (!monto || !plazoRaw || !(tiie+spread)) {
-    alert('Por favor completa: Monto, Plazo y espera a que la TIIE se recupere automáticamente.');
+    alert('Por favor completa: Monto, Tasa y Plazo.');
     return;
   }
 
@@ -1154,7 +986,7 @@ function calcular() {
   renderResults({
     monto, tasaAnual, numPagos, periodo:periodoInt, periodoCap,
     totalPago, totalInteres, totalCapital,
-    primerPago, cat, tipoAmort, tipoCredito, graceMeses, destino: document.getElementById('inp-destino').value
+    primerPago, cat, tipoAmort, tipoCredito, graceMeses
   }, tabla);
 }
 
@@ -1277,11 +1109,8 @@ function exportPDF() {
   var monto = parseMoney(document.getElementById('inp-monto').value);
   var tiie = parseFloat(document.getElementById('inp-tiie').value)||0;
   var spread = parseFloat(document.getElementById('inp-spread').value)||0;
-  var destino = document.getElementById('inp-destino').value;
-  var plazo = document.getElementById('inp-plazo').value + ' ' + getSelectedText('inp-unidad');
+  var plazo = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
   var periodo = document.getElementById('inp-periodo-interes').value;
-  var periodoCap = document.getElementById('inp-periodo-capital').value || 'igual';
-  var graceMeses = parseInt(document.getElementById('inp-grace').value, 10) || 0;
 
   doc.setFillColor(235,242,252); doc.rect(mL,y,cW,18,'F');
   doc.setFontSize(8); doc.setTextColor(30,50,100); doc.setFont('helvetica','normal');
@@ -1291,13 +1120,13 @@ function exportPDF() {
   doc.text(fmtMXN(monto), mL+2, y+13);
   doc.setFont('helvetica','bold');
   doc.text('Tasa anual:', mL+cols+2, y+6); doc.setFont('helvetica','normal');
-  doc.text(destinoLabel(destino) + ' | TIIE ' + tiie.toFixed(4) + '% + ' + spread.toFixed(2) + ' pts = ' + (tiie+spread).toFixed(4) + '%', mL+cols+2, y+13);
+  doc.text('TIIE ' + tiie.toFixed(4) + '% + ' + spread.toFixed(4) + '% = ' + (tiie+spread).toFixed(4) + '%', mL+cols+2, y+13);
   doc.setFont('helvetica','bold');
   doc.text('Plazo:', mL+cols*2+2, y+6); doc.setFont('helvetica','normal');
   doc.text(plazo, mL+cols*2+2, y+13);
   doc.setFont('helvetica','bold');
   doc.text('Periodicidad:', mL+cols*3+2, y+6); doc.setFont('helvetica','normal');
-  doc.text(periodLabel(periodo) + (periodoCap !== 'igual' ? ' | Cap: ' + capitalPeriodLabel(periodoCap) : ''), mL+cols*3+2, y+13);
+  doc.text(periodLabel(periodo) + (periodoCap !== 'igual' ? ' | Cap: ' + periodoCap : ''), mL+cols*3+2, y+13);
   if (graceMeses > 0) {
     doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(140,90,0);
     doc.text('Período de gracia de capital: ' + graceMeses + ' meses', mL+2, y+20);
@@ -1377,8 +1206,7 @@ function exportExcel() {
   var monto  = parseMoney(document.getElementById('inp-monto').value);
   var tiie   = parseFloat(document.getElementById('inp-tiie').value)||0;
   var spread = parseFloat(document.getElementById('inp-spread').value)||0;
-  var destino = document.getElementById('inp-destino').value;
-  var plazo  = document.getElementById('inp-plazo').value + ' ' + getSelectedText('inp-unidad');
+  var plazo  = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
   var periodo= document.getElementById('inp-periodo-interes').value;
   var periodoCap = document.getElementById('inp-periodo-capital').value;
   var graceMeses = document.getElementById('inp-grace').value || '0';
@@ -1390,15 +1218,14 @@ function exportExcel() {
     ['TABLA DE AMORTIZACIÓN - PROAKTIVA SAPI de CV, SOFOM, ENR'],
     [],
     ['Tipo de crédito', tipoCredito],
-    ['Destino', destinoLabel(destino)],
     ['Monto', monto],
-    ['TIIE 28 DOF', tiie + '%'],
-    ['Margen', spread + ' pts'],
+    ['Tasa TIIE', tiie + '%'],
+    ['Spread', spread + '%'],
     ['Tasa total', (tiie+spread) + '%'],
     ['Plazo', plazo],
     ['Periodicidad', periodLabel(periodo)],
     ['Tipo amortización', tipoLabel(tipoAmort)],
-    ['Periodicidad capital', capitalPeriodLabel(periodoCap)],
+    ['Periodicidad capital', periodoCap],
     ['Período de gracia', (parseInt(graceMeses)||0) + ' meses'],
     ['Fecha generación', new Date().toLocaleDateString('es-MX')],
   ];
@@ -1429,7 +1256,13 @@ function setMode(mode) {
 }
 
 // ── TASA DISPLAY FOR COMPARE ──────────────────────────────────────────────
-// Se reutiliza la función updateTasaDisplay definida en el bloque de TIIE automática.
+function updateTasaDisplay(sc) {
+  var tiie   = parseFloat(document.getElementById('cmp-tiie-' + sc).value)   || 0;
+  var spread = parseFloat(document.getElementById('cmp-spread-' + sc).value) || 0;
+  var total  = tiie + spread;
+  var el = document.getElementById('cmp-tasa-display-' + sc);
+  el.textContent = total > 0 ? 'Tasa total: ' + total.toFixed(4) + '% anual' : '';
+}
 
 // ── BUILD AMORT TABLE FOR COMPARE ─────────────────────────────────────────
 function buildTabla(monto, tasaAnual, totalMeses, mesesInt, mesesCap, amort, graceMeses, bulletStart, fechaInicio, periodoInt) {
@@ -1537,13 +1370,13 @@ function readScenario(sc) {
   var periodo= document.getElementById('cmp-periodo-interes-' + sc) ? document.getElementById('cmp-periodo-interes-' + sc).value : document.getElementById('cmp-periodo-' + sc).value;
   var amort  = document.getElementById('cmp-amort-' + sc).value;
   if (!monto || !plazo || !(tiie+spread)) {
-    alert('Completa Monto y Plazo del Escenario ' + sc.toUpperCase() + ' y verifica que la TIIE se haya recuperado.');
+    alert('Completa todos los campos del Escenario ' + sc.toUpperCase());
     return null;
   }
   var periodoMap = {mensual:1,bimestral:2,trimestral:3,semestral:6,anual:12};
   var totalMeses = unidad === 'anios' ? plazo * 12 : plazo;
   var mesesInt   = periodoMap[periodo] || 1;
-  return {monto, tasaAnual:(tiie+spread)/100, tiie, spread, destino: document.getElementById('cmp-destino-' + sc).value, plazo, unidad, periodo,
+  return {monto, tasaAnual:(tiie+spread)/100, tiie, spread, plazo, unidad, periodo,
           totalMeses, mesesInt, mesesCap:mesesInt, amort};
 }
 
@@ -1684,7 +1517,6 @@ function exportComparePDF() {
     ['Parámetro','Escenario A','Escenario B'],
     ['Tipo crédito', A.tipo||'—', B.tipo||'—'],
     ['Monto', fmtMXN(A.monto), fmtMXN(B.monto)],
-    ['Destino', destinoLabel(A.destino), destinoLabel(B.destino)],
     ['Tasa anual', ((A.tasaAnual)*100).toFixed(4)+'%', ((B.tasaAnual)*100).toFixed(4)+'%'],
     ['Plazo', A.plazo+' '+A.unidad, B.plazo+' '+B.unidad],
     ['Periodicidad', A.periodo, B.periodo],
@@ -1738,7 +1570,6 @@ function exportCompareExcel() {
     [],
     ['Parámetro','Escenario A','Escenario B'],
     ['Monto', A.monto, B.monto],
-    ['Destino', destinoLabel(A.destino), destinoLabel(B.destino)],
     ['Tasa anual %', A.tasaAnual*100, B.tasaAnual*100],
     ['Plazo', A.plazo+' '+A.unidad, B.plazo+' '+B.unidad],
     ['Periodicidad', A.periodo, B.periodo],
