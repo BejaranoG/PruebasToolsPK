@@ -578,10 +578,10 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
                 </div>
               </div>
 
-              <!-- Periodicidad de pago -->
+              <!-- Periodicidad INTERÉS -->
               <div class="field-group">
-                <div class="field-label">Periodicidad de pago</div>
-                <select id="inp-periodo" class="calc-input calc-select">
+                <div class="field-label">Periodicidad de pago — Interés</div>
+                <select id="inp-periodo-interes" class="calc-input calc-select">
                   <option value="mensual">Mensual</option>
                   <option value="bimestral">Bimestral</option>
                   <option value="trimestral">Trimestral</option>
@@ -590,14 +590,41 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
                 </select>
               </div>
 
+              <!-- Periodicidad CAPITAL -->
+              <div class="field-group" id="field-periodo-capital">
+                <div class="field-label">Periodicidad de pago — Capital</div>
+                <select id="inp-periodo-capital" class="calc-input calc-select">
+                  <option value="igual">Igual que interés</option>
+                  <option value="mensual">Mensual</option>
+                  <option value="trimestral">Trimestral</option>
+                  <option value="semestral">Semestral</option>
+                  <option value="anual">Anual</option>
+                  <option value="bullet">Bullet (al vencimiento)</option>
+                </select>
+              </div>
+
               <!-- Tipo de amortización -->
               <div class="field-group">
                 <div class="field-label">Tipo de amortización</div>
                 <div class="amort-tabs">
-                  <div class="amort-tab active" onclick="setAmort('frances',this)" title="Pago fijo, capital creciente">🇫🇷 Francés</div>
-                  <div class="amort-tab" onclick="setAmort('aleman',this)" title="Capital fijo, pago decreciente">🇩🇪 Alemán</div>
-                  <div class="amort-tab" onclick="setAmort('bullet',this)" title="Solo intereses, capital al final">🎯 Bullet</div>
+                  <div class="amort-tab active" onclick="setAmort('frances',this)" title="Cuota fija, capital crece cada periodo">📈 Capital Creciente</div>
+                  <div class="amort-tab" onclick="setAmort('aleman',this)" title="Capital fijo cada periodo, interés decrece">📊 Capital Fijo</div>
+                  <div class="amort-tab" onclick="setAmort('bullet',this)" title="Intereses hasta período elegido, luego capital creciente">🎯 Bullet/Diferido</div>
                 </div>
+              </div>
+
+              <!-- Período de gracia -->
+              <div class="field-group" id="field-grace">
+                <div class="field-label">Período de gracia de capital (meses)</div>
+                <input type="number" id="inp-grace" class="calc-input" placeholder="0 = sin gracia" min="0" value="0" />
+                <div class="tiie-hint">Meses de solo interés antes de iniciar amortización de capital</div>
+              </div>
+
+              <!-- Inicio de capital (Bullet/Diferido) -->
+              <div class="field-group" id="field-bullet-start" style="display:none;background:#fff8e8;border:1px solid #f0d080;border-radius:8px;padding:12px">
+                <div class="field-label" style="color:var(--calc-gold)">Iniciar pago a capital en el período #</div>
+                <input type="number" id="inp-bullet-start" class="calc-input" placeholder="Ej. 13" min="1" />
+                <div class="tiie-hint">A partir de este período el capital se amortiza de forma creciente hasta el vencimiento</div>
               </div>
 
               <!-- Fecha inicio -->
@@ -848,6 +875,11 @@ function setAmort(a, el) {
   tipoAmort = a;
   document.querySelectorAll('.amort-tab').forEach(function(x){ x.classList.remove('active'); });
   el.classList.add('active');
+  // Show/hide conditional fields
+  var isBullet = (a === 'bullet');
+  document.getElementById('field-grace').style.display       = isBullet ? 'none' : '';
+  document.getElementById('field-bullet-start').style.display = isBullet ? '' : 'none';
+  document.getElementById('field-periodo-capital').style.display = isBullet ? 'none' : '';
 }
 
 // Live tasa display
@@ -870,85 +902,46 @@ document.addEventListener('input', function(e) {
 
 // ── MAIN CALC ─────────────────────────────────────────────────────────────
 function calcular() {
-  var monto    = parseMoney(document.getElementById('inp-monto').value);
-  var tiie     = parseFloat(document.getElementById('inp-tiie').value)   || 0;
-  var spread   = parseFloat(document.getElementById('inp-spread').value) || 0;
-  var plazoRaw = parseInt(document.getElementById('inp-plazo').value)    || 0;
-  var unidad   = document.getElementById('inp-unidad').value;
-  var periodo  = document.getElementById('inp-periodo').value;
-  var fechaStr = document.getElementById('inp-fecha').value;
-  var apertura = parseFloat(document.getElementById('inp-apertura').value) || 0;
-  var anualFee = parseFloat(document.getElementById('inp-anual-fee').value) || 0;
+  var monto      = parseMoney(document.getElementById('inp-monto').value);
+  var tiie       = parseFloat(document.getElementById('inp-tiie').value)        || 0;
+  var spread     = parseFloat(document.getElementById('inp-spread').value)      || 0;
+  var plazoRaw   = parseInt(document.getElementById('inp-plazo').value)         || 0;
+  var unidad     = document.getElementById('inp-unidad').value;
+  var periodoInt = document.getElementById('inp-periodo-interes').value;
+  var periodoCap = document.getElementById('inp-periodo-capital').value;
+  var fechaStr   = document.getElementById('inp-fecha').value;
+  var apertura   = parseFloat(document.getElementById('inp-apertura').value)    || 0;
+  var anualFee   = parseFloat(document.getElementById('inp-anual-fee').value)   || 0;
+  var graceMeses = parseInt(document.getElementById('inp-grace').value)         || 0;
+  var bulletStart= parseInt(document.getElementById('inp-bullet-start').value)  || 0;
 
   if (!monto || !plazoRaw || !(tiie+spread)) {
     alert('Por favor completa: Monto, Tasa y Plazo.');
     return;
   }
 
-  var tasaAnual = (tiie + spread) / 100;
-  var mesesPorPeriodo = {mensual:1,bimestral:2,trimestral:3,semestral:6,anual:12}[periodo] || 1;
+  var tasaAnual  = (tiie + spread) / 100;
   var totalMeses = unidad === 'anios' ? plazoRaw * 12 : plazoRaw;
-  var numPagos   = Math.ceil(totalMeses / mesesPorPeriodo);
-  var tasaPeriodo = tasaAnual * mesesPorPeriodo / 12;
+  var periodoMap = {mensual:1,bimestral:2,trimestral:3,semestral:6,anual:12};
+  var mesesInt   = periodoMap[periodoInt] || 1;
+  var mesesCap   = periodoCap === 'igual' ? mesesInt : periodoCap === 'bullet' ? totalMeses : (periodoMap[periodoCap] || mesesInt);
+  var fechaInicio= fechaStr ? new Date(fechaStr + 'T12:00:00') : new Date();
 
-  var fechaInicio = fechaStr ? new Date(fechaStr + 'T12:00:00') : new Date();
-  var tabla = [];
-
-  if (tipoAmort === 'frances') {
-    // Cuota fija
-    var cuota = (tasaPeriodo === 0)
-      ? monto / numPagos
-      : monto * tasaPeriodo / (1 - Math.pow(1 + tasaPeriodo, -numPagos));
-    var saldo = monto;
-    for (var i = 1; i <= numPagos; i++) {
-      var interes = saldo * tasaPeriodo;
-      var capital = cuota - interes;
-      if (i === numPagos) capital = saldo;
-      saldo = Math.max(0, saldo - capital);
-      tabla.push({ n:i, fecha:addDate(fechaInicio,i,periodo), capital:capital, interes:interes, pago:capital+interes, saldo:saldo });
-    }
-  } else if (tipoAmort === 'aleman') {
-    // Capital fijo
-    var capitalFijo = monto / numPagos;
-    var saldo = monto;
-    for (var i = 1; i <= numPagos; i++) {
-      var interes = saldo * tasaPeriodo;
-      var capital = i === numPagos ? saldo : capitalFijo;
-      saldo = Math.max(0, saldo - capital);
-      tabla.push({ n:i, fecha:addDate(fechaInicio,i,periodo), capital:capital, interes:interes, pago:capital+interes, saldo:saldo });
-    }
-  } else { // bullet
-    // Solo intereses, capital al final
-    var saldo = monto;
-    for (var i = 1; i <= numPagos; i++) {
-      var interes = monto * tasaPeriodo;
-      var capital = i === numPagos ? monto : 0;
-      saldo = i === numPagos ? 0 : monto;
-      tabla.push({ n:i, fecha:addDate(fechaInicio,i,periodo), capital:capital, interes:interes, pago:capital+interes, saldo:saldo });
-    }
-  }
+  var tabla = buildTabla(monto, tasaAnual, totalMeses, mesesInt, mesesCap, tipoAmort, graceMeses, bulletStart, fechaInicio, periodoInt);
 
   tablaData = tabla;
 
-  // KPIs
-  var totalPago     = tabla.reduce(function(s,r){ return s+r.pago; }, 0);
-  var totalInteres  = tabla.reduce(function(s,r){ return s+r.interes; }, 0);
-  var totalCapital  = tabla.reduce(function(s,r){ return s+r.capital; }, 0);
-  var primerPago    = tabla[0] ? tabla[0].pago : 0;
-  var ultimoPago    = tabla[tabla.length-1] ? tabla[tabla.length-1].pago : 0;
+  var totalPago    = tabla.reduce(function(s,r){ return s+r.pago; }, 0);
+  var totalInteres = tabla.reduce(function(s,r){ return s+r.interes; }, 0);
+  var totalCapital = tabla.reduce(function(s,r){ return s+r.capital; }, 0);
+  var primerPago   = tabla[0] ? tabla[0].pago : 0;
+  var numPagos     = tabla.length;
+  var cat          = calcCAT(monto, tabla, tasaAnual, monto * apertura/100, anualFee);
 
-  // CAT
-  var comisionApertura = monto * apertura / 100;
-  var comisionesAnuales = monto * anualFee / 100 * (totalMeses / 12);
-  var costoTotal = totalPago + comisionApertura + comisionesAnuales;
-  var cat = calcCAT(monto, tabla, tasaAnual, comisionApertura, anualFee);
-
-  // Render
   renderResults({
-    monto, tasaAnual, tasaPeriodo, numPagos, periodo,
+    monto, tasaAnual, numPagos, periodo:periodoInt, periodoCap,
     totalPago, totalInteres, totalCapital,
-    primerPago, ultimoPago, cat,
-    tipoAmort, tipoCredito
+    primerPago, cat, tipoAmort, tipoCredito, graceMeses
   }, tabla);
 }
 
@@ -1001,7 +994,9 @@ function renderResults(kpis, tabla) {
   // Table
   html += '<div class="table-card">';
   html += '<div class="table-card-header">';
-  html += '<div class="table-card-title">📋 Tabla de amortización — ' + tipoLabel(tipoAmort) + '</div>';
+  var graceInfo = kpis.graceMeses > 0 ? ' · Gracia: '+kpis.graceMeses+' meses' : '';
+  var capInfo   = kpis.periodoCap && kpis.periodoCap !== 'igual' ? ' · Capital: '+kpis.periodoCap : '';
+  html += '<div class="table-card-title">📋 Tabla de amortización — ' + tipoLabel(tipoAmort) + graceInfo + capInfo + '</div>';
   html += '<div class="export-btns">';
   html += '<button class="export-btn pdf" onclick="exportPDF()">⬇ PDF</button>';
   html += '<button class="export-btn excel" onclick="exportExcel()">⬇ Excel</button>';
@@ -1037,7 +1032,7 @@ function kpiCard(label, value, color, sub) {
 }
 function pctOf(a, b) { return b ? (a/b*100).toFixed(1) : '0.0'; }
 function periodLabel(p) { return {mensual:'Mensual',bimestral:'Bimestral',trimestral:'Trimestral',semestral:'Semestral',anual:'Anual'}[p] || p; }
-function tipoLabel(t) { return {frances:'Francés (cuota fija)',aleman:'Alemán (capital fijo)',bullet:'Bullet (solo intereses)'}[t] || t; }
+function tipoLabel(t) { return {frances:'Capital Creciente',aleman:'Capital Fijo',bullet:'Bullet / Diferido'}[t] || t; }
 
 // ── EXPORT PDF ─────────────────────────────────────────────────────────────
 function exportPDF() {
@@ -1070,7 +1065,7 @@ function exportPDF() {
   var tiie = parseFloat(document.getElementById('inp-tiie').value)||0;
   var spread = parseFloat(document.getElementById('inp-spread').value)||0;
   var plazo = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
-  var periodo = document.getElementById('inp-periodo').value;
+  var periodo = document.getElementById('inp-periodo-interes').value;
 
   doc.setFillColor(235,242,252); doc.rect(mL,y,cW,18,'F');
   doc.setFontSize(8); doc.setTextColor(30,50,100); doc.setFont('helvetica','normal');
@@ -1086,7 +1081,11 @@ function exportPDF() {
   doc.text(plazo, mL+cols*2+2, y+13);
   doc.setFont('helvetica','bold');
   doc.text('Periodicidad:', mL+cols*3+2, y+6); doc.setFont('helvetica','normal');
-  doc.text(periodLabel(periodo), mL+cols*3+2, y+13);
+  doc.text(periodLabel(periodo) + (periodoCap !== 'igual' ? ' | Cap: ' + periodoCap : ''), mL+cols*3+2, y+13);
+  if (graceMeses > 0) {
+    doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(140,90,0);
+    doc.text('Período de gracia de capital: ' + graceMeses + ' meses', mL+2, y+20);
+  }
   y += 24;
 
   // Table headers
@@ -1163,7 +1162,9 @@ function exportExcel() {
   var tiie   = parseFloat(document.getElementById('inp-tiie').value)||0;
   var spread = parseFloat(document.getElementById('inp-spread').value)||0;
   var plazo  = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
-  var periodo= document.getElementById('inp-periodo').value;
+  var periodo= document.getElementById('inp-periodo-interes').value;
+  var periodoCap = document.getElementById('inp-periodo-capital').value;
+  var graceMeses = document.getElementById('inp-grace').value || '0';
 
   var wb = XLSX.utils.book_new();
 
@@ -1179,6 +1180,8 @@ function exportExcel() {
     ['Plazo', plazo],
     ['Periodicidad', periodLabel(periodo)],
     ['Tipo amortización', tipoLabel(tipoAmort)],
+    ['Periodicidad capital', periodoCap],
+    ['Período de gracia', (parseInt(graceMeses)||0) + ' meses'],
     ['Fecha generación', new Date().toLocaleDateString('es-MX')],
   ];
   var wsP = XLSX.utils.aoa_to_sheet(params);
@@ -1217,41 +1220,79 @@ function updateTasaDisplay(sc) {
 }
 
 // ── BUILD AMORT TABLE FOR COMPARE ─────────────────────────────────────────
-function buildTabla(monto, tasaAnual, plazoRaw, unidad, periodo, amort) {
-  var mesesPorPeriodo = {mensual:1,bimestral:2,trimestral:3,semestral:6,anual:12}[periodo] || 1;
-  var totalMeses = unidad === 'anios' ? plazoRaw * 12 : plazoRaw;
-  var numPagos   = Math.ceil(totalMeses / mesesPorPeriodo);
-  var tasaPeriodo = tasaAnual * mesesPorPeriodo / 12;
-  var tabla = [];
+function buildTabla(monto, tasaAnual, totalMeses, mesesInt, mesesCap, amort, graceMeses, bulletStart, fechaInicio, periodoInt) {
+  var periodoMap = {mensual:1,bimestral:2,trimestral:3,semestral:6,anual:12};
+  var nInt = Math.round(totalMeses / mesesInt);  // total interest-period rows
+  var tasaInt = tasaAnual * mesesInt / 12;        // rate per interest period
+  var tasaCap = tasaAnual * mesesCap / 12;        // rate per capital period
 
-  if (amort === 'frances') {
-    var cuota = tasaPeriodo === 0 ? monto / numPagos
-      : monto * tasaPeriodo / (1 - Math.pow(1 + tasaPeriodo, -numPagos));
-    var saldo = monto;
-    for (var i = 1; i <= numPagos; i++) {
-      var interes = saldo * tasaPeriodo;
-      var capital = cuota - interes;
-      if (i === numPagos) capital = saldo;
-      saldo = Math.max(0, saldo - capital);
-      tabla.push({n:i, capital:capital, interes:interes, pago:capital+interes, saldo:saldo});
+  // How many capital periods exist in total
+  var nCapTotal  = Math.round(totalMeses / mesesCap);
+  // Grace in capital periods
+  var graceCapPeriods = graceMeses > 0 ? Math.ceil(graceMeses / mesesCap) : 0;
+  // Paying capital periods
+  var nCapPaying = nCapTotal - graceCapPeriods;
+
+  // Pre-build capital payment schedule: {interestRowIndex: capitalAmount}
+  var capSchedule = {};
+
+  if (amort === 'bullet') {
+    // Interest only until bulletStart-1, then capital creciente from bulletStart
+    var bStart = bulletStart >= 1 ? bulletStart : nInt; // default: last period
+    bStart = Math.min(bStart, nInt);
+    var nCapBullet = nInt - bStart + 1;
+    var saldoBullet = monto;
+    if (nCapBullet > 0) {
+      var PMTbullet = tasaInt === 0 ? monto / nCapBullet
+        : monto * tasaInt / (1 - Math.pow(1 + tasaInt, -nCapBullet));
+      for (var k = bStart; k <= nInt; k++) {
+        var intK = saldoBullet * tasaInt;
+        var capK = (k === nInt) ? saldoBullet : PMTbullet - intK;
+        capSchedule[k] = capK;
+        saldoBullet = Math.max(0, saldoBullet - capK);
+      }
+    } else {
+      capSchedule[nInt] = monto; // pure bullet
     }
-  } else if (amort === 'aleman') {
-    var capitalFijo = monto / numPagos;
-    var saldo = monto;
-    for (var i = 1; i <= numPagos; i++) {
-      var interes = saldo * tasaPeriodo;
-      var capital = i === numPagos ? saldo : capitalFijo;
-      saldo = Math.max(0, saldo - capital);
-      tabla.push({n:i, capital:capital, interes:interes, pago:capital+interes, saldo:saldo});
+
+  } else if (amort === 'frances') {
+    // Annuity at capital-period rate; capital distributed at capital periods
+    var PMT = tasaCap === 0 ? monto / nCapPaying
+      : monto * tasaCap / (1 - Math.pow(1 + tasaCap, -nCapPaying));
+    var saldoF = monto;
+    for (var k = 0; k < nCapTotal; k++) {
+      if (k < graceCapPeriods) continue; // grace: no capital
+      var intC  = saldoF * tasaCap;
+      var capC  = PMT - intC;
+      var isPaying = k - graceCapPeriods;
+      if (isPaying === nCapPaying - 1) capC = saldoF; // last payment: clear balance
+      // Map capital period k to interest-row index
+      var rowIdx = Math.round((k + 1) * mesesCap / mesesInt);
+      capSchedule[rowIdx] = capC;
+      saldoF = Math.max(0, saldoF - capC);
     }
-  } else {
-    var saldo = monto;
-    for (var i = 1; i <= numPagos; i++) {
-      var interes = monto * tasaPeriodo;
-      var capital = i === numPagos ? monto : 0;
-      saldo       = i === numPagos ? 0 : monto;
-      tabla.push({n:i, capital:capital, interes:interes, pago:capital+interes, saldo:saldo});
+
+  } else { // aleman: fixed capital each capital period
+    var capFijo = monto / nCapPaying;
+    for (var k = 0; k < nCapTotal; k++) {
+      if (k < graceCapPeriods) continue;
+      var isPaying = k - graceCapPeriods;
+      var rowIdx = Math.round((k + 1) * mesesCap / mesesInt);
+      capSchedule[rowIdx] = (isPaying === nCapPaying - 1)
+        ? monto - capFijo * isPaying  // last: remainder
+        : capFijo;
     }
+  }
+
+  // Generate rows at interest-period frequency
+  var tabla = [];
+  var saldo = monto;
+  for (var i = 1; i <= nInt; i++) {
+    var interes = saldo * tasaInt;
+    var capital = capSchedule[i] || 0;
+    saldo = Math.max(0, saldo - capital);
+    var fecha = fechaInicio ? addDate(fechaInicio, i, periodoInt) : null;
+    tabla.push({ n:i, fecha:fecha, capital:capital, interes:interes, pago:capital+interes, saldo:saldo });
   }
   return tabla;
 }
@@ -1262,8 +1303,8 @@ function compararEscenarios() {
   var B = readScenario('b');
   if (!A || !B) return;
 
-  var tabA = buildTabla(A.monto, A.tasaAnual, A.plazo, A.unidad, A.periodo, A.amort);
-  var tabB = buildTabla(B.monto, B.tasaAnual, B.plazo, B.unidad, B.periodo, B.amort);
+  var tabA = buildTabla(A.monto, A.tasaAnual, A.totalMeses, A.mesesInt, A.mesesCap, A.amort, 0, 0, null, A.periodo);
+  var tabB = buildTabla(B.monto, B.tasaAnual, B.totalMeses, B.mesesInt, B.mesesCap, B.amort, 0, 0, null, B.periodo);
 
   var kA = calcKpis(tabA, A.monto);
   var kB = calcKpis(tabB, B.monto);
@@ -1281,13 +1322,17 @@ function readScenario(sc) {
   var spread = parseFloat(document.getElementById('cmp-spread-' + sc).value) || 0;
   var plazo  = parseInt(document.getElementById('cmp-plazo-' + sc).value)    || 0;
   var unidad = document.getElementById('cmp-unidad-' + sc).value;
-  var periodo= document.getElementById('cmp-periodo-' + sc).value;
+  var periodo= document.getElementById('cmp-periodo-interes-' + sc) ? document.getElementById('cmp-periodo-interes-' + sc).value : document.getElementById('cmp-periodo-' + sc).value;
   var amort  = document.getElementById('cmp-amort-' + sc).value;
   if (!monto || !plazo || !(tiie+spread)) {
     alert('Completa todos los campos del Escenario ' + sc.toUpperCase());
     return null;
   }
-  return {monto, tasaAnual:(tiie+spread)/100, tiie, spread, plazo, unidad, periodo, amort};
+  var periodoMap = {mensual:1,bimestral:2,trimestral:3,semestral:6,anual:12};
+  var totalMeses = unidad === 'anios' ? plazo * 12 : plazo;
+  var mesesInt   = periodoMap[periodo] || 1;
+  return {monto, tasaAnual:(tiie+spread)/100, tiie, spread, plazo, unidad, periodo,
+          totalMeses, mesesInt, mesesCap:mesesInt, amort};
 }
 
 function calcKpis(tabla, monto) {
