@@ -1064,7 +1064,8 @@ function exportPDF() {
   var monto = parseMoney(document.getElementById('inp-monto').value);
   var tiie = parseFloat(document.getElementById('inp-tiie').value)||0;
   var spread = parseFloat(document.getElementById('inp-spread').value)||0;
-  var plazo = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
+  var unidadTxt = document.getElementById('inp-unidad').options[document.getElementById('inp-unidad').selectedIndex].text;
+  var plazo = document.getElementById('inp-plazo').value + ' ' + unidadTxt;
   var periodo = document.getElementById('inp-periodo-interes').value;
   var periodoCap = document.getElementById('inp-periodo-capital').value || 'igual';
   var graceMeses = parseInt(document.getElementById('inp-grace').value, 10) || 0;
