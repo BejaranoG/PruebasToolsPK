@@ -687,84 +687,84 @@ function AforoApp() {
   return (
     <div className="aforo-app">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
-        .aforo-app { font-family: 'DM Sans', sans-serif; background: #f5f2ed; min-height: 100%; }
-        .aforo-main { display: grid; grid-template-columns: 1fr 340px; gap: 0; max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
-        @media (max-width: 860px) { 
+
+        .aforo-app { font-family: "IBM Plex Sans", sans-serif; background: var(--surface2); min-height: 100%; color: var(--ink); }
+        .aforo-main { display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 24px; max-width: 1280px; margin: 0 auto; padding: 32px 24px; align-items: start; }
+        @media (max-width: 980px) {
           .aforo-main { grid-template-columns: 1fr; padding: 20px 16px; }
+          .aforo-sidebar { position: static; }
         }
         @media (max-width: 480px) {
-          .aforo-main { padding: 12px 10px; }
+          .aforo-main { padding: 12px 10px; gap: 14px; }
           .aforo-form { padding-right: 0 !important; }
-          .asection-header { padding: 10px 14px; }
+          .asection-header { padding: 12px 14px; }
           .asection-body { padding: 14px !important; }
           .arow-2 { grid-template-columns: 1fr !important; }
-          .atoggles-grid { grid-template-columns: 1fr 1fr !important; }
-          .aforo-kpis .akpi-value.big { font-size: 18px; }
+          .atoggles-grid { grid-template-columns: 1fr !important; }
+          .aforo-kpis .akpi-value.big { font-size: 22px; }
           .aforo-pdf-btn { width: 100%; justify-content: center; }
         }
-        .aforo-form { padding-right: 28px; display: flex; flex-direction: column; gap: 20px; }
-        .asection { background: white; border: 1px solid #e0dbd2; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-        .asection-header { background: #faf8f5; border-bottom: 1px solid #e0dbd2; padding: 12px 18px; display: flex; align-items: center; gap: 10px; }
-        .asection-num { width: 26px; height: 26px; background: #1a3a2a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
-        .asection-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: #1a3a2a; }
+        .aforo-form { padding-right: 0; display: flex; flex-direction: column; gap: 20px; }
+        .asection { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+        .asection-header { background: linear-gradient(180deg, #fbfdff 0%, #f4f8fc 100%); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; gap: 10px; }
+        .asection-num { width: 28px; height: 28px; background: linear-gradient(135deg, var(--blue), var(--blue3)); color: #fff; border-radius: 999px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; box-shadow: 0 6px 14px rgba(14,95,168,0.18); }
+        .asection-title { font-family: "Playfair Display", serif; font-size: 17px; color: var(--ink); font-weight: 500; }
         .asection-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
-        .afield { display: flex; flex-direction: column; gap: 5px; }
-        .afield-label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: #5a5752; }
-        .afield-hint { font-size: 12px; color: #9a968f; font-style: italic; }
-        .aforo-app input[type="text"] { width: 100%; padding: 10px 13px; border: 1.5px solid #e0dbd2; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #1a1a18; background: white; outline: none; transition: border-color 0.2s; }
-        .aforo-app input:focus { border-color: #2d6a4f; }
+        .afield { display: flex; flex-direction: column; gap: 6px; }
+        .afield-label { font-size: 11px; font-weight: 600; letter-spacing: 0.9px; text-transform: uppercase; color: var(--muted); }
+        .afield-hint { font-size: 12px; color: var(--muted); }
+        .aforo-app input[type="text"] { width: 100%; padding: 11px 13px; border: 1.5px solid var(--border); border-radius: 10px; font-family: "IBM Plex Sans", sans-serif; font-size: 14px; color: var(--ink); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; }
+        .aforo-app input[type="text"]:hover { border-color: #bfd3ea; }
+        .aforo-app input:focus { border-color: var(--blue2); box-shadow: 0 0 0 4px rgba(58,157,232,0.12); }
         .arow-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .aradio-group { display: flex; flex-direction: column; gap: 7px; }
-        .aradio-option { display: flex; align-items: flex-start; gap: 9px; padding: 9px 13px; border: 1.5px solid #e0dbd2; border-radius: 8px; cursor: pointer; transition: all 0.15s; font-size: 13px; line-height: 1.4; }
-        .aradio-option:hover { border-color: #2d6a4f; background: #f0f7f3; }
-        .aradio-option.selected { border-color: #2d6a4f; background: #e8f4ee; color: #1a3a2a; font-weight: 500; }
-        .aradio-option.tentativo { border-color: #e0a020; background: #fffbf0; }
-        .aradio-option input[type="radio"] { margin-top: 2px; accent-color: #2d6a4f; flex-shrink: 0; }
-        .abadge-tentativo { margin-left: auto; font-size: 10px; font-weight: 600; color: #b5860d; white-space: nowrap; }
-        .atoggle { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; padding: 6px 0; user-select: none; }
-        .atoggle-track { width: 40px; height: 22px; background: #e0dbd2; border-radius: 11px; position: relative; transition: background 0.2s; flex-shrink: 0; }
-        .atoggle-track.on { background: #2d6a4f; }
-        .atoggle-thumb { width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .aradio-group { display: flex; flex-direction: column; gap: 8px; }
+        .aradio-option { display: flex; align-items: flex-start; gap: 9px; padding: 11px 13px; border: 1.5px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.18s; font-size: 13px; line-height: 1.45; background: #fff; color: var(--ink); }
+        .aradio-option:hover { border-color: #b8d4f2; background: #f7fbff; }
+        .aradio-option.selected { border-color: var(--blue2); background: #edf6ff; color: var(--ink); box-shadow: inset 0 0 0 1px rgba(26,125,212,0.1); font-weight: 500; }
+        .aradio-option.tentativo { border-color: #efd8a4; background: #fffaf0; }
+        .aradio-option input[type="radio"] { margin-top: 2px; accent-color: var(--blue2); flex-shrink: 0; }
+        .abadge-tentativo { margin-left: auto; font-size: 10px; font-weight: 600; color: var(--gold); white-space: nowrap; }
+        .atoggle { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; padding: 6px 0; user-select: none; color: var(--ink); }
+        .atoggle-track { width: 42px; height: 24px; background: #d8e2ee; border-radius: 999px; position: relative; transition: background 0.2s; flex-shrink: 0; }
+        .atoggle-track.on { background: linear-gradient(135deg, var(--blue), var(--blue3)); }
+        .atoggle-thumb { width: 18px; height: 18px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: transform 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.16); }
         .atoggle-track.on .atoggle-thumb { transform: translateX(18px); }
-        .atoggles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-        .agrupo-tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
-        .agrupo-tab { padding: 7px 14px; border: 1.5px solid #e0dbd2; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.15s; background: white; font-family: 'DM Sans', sans-serif; }
-        .agrupo-tab.active { border-color: #2d6a4f; background: #e8f4ee; color: #1a3a2a; font-weight: 600; }
-        /* Sidebar */
+        .atoggles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
+        .agrupo-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .agrupo-tab { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 999px; cursor: pointer; font-size: 12px; transition: all 0.18s; background: #fff; font-family: "IBM Plex Sans", sans-serif; color: var(--muted); }
+        .agrupo-tab:hover { border-color: #b8d4f2; color: var(--ink); background: #f7fbff; }
+        .agrupo-tab.active { border-color: var(--blue2); background: #edf6ff; color: var(--blue); font-weight: 600; }
         .aforo-sidebar { position: sticky; top: 24px; }
-        .aforo-result-panel { background: #1a3a2a; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.15); color: white; }
-        .aforo-result-header { padding: 16px 20px 12px; border-bottom: 1px solid rgba(255,255,255,0.12); }
-        .aforo-result-header h3 { font-family: 'DM Serif Display', serif; font-size: 18px; color: #a8c5b5; }
-        .aforo-kpis { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.12); }
-        .akpi { display: flex; justify-content: space-between; align-items: center; }
-        .akpi-label { font-size: 11px; letter-spacing: 0.5px; color: #7aaa90; }
-        .akpi-value { font-size: 15px; font-weight: 600; color: white; }
-        .akpi-value.big { font-size: 26px; color: #7dffb3; }
-        .aforo-indicator { padding: 12px 20px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.12); }
-        .aforo-bar-bg { height: 7px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; margin: 6px 0 4px; }
-        .aforo-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s; background: linear-gradient(90deg, #3a9a6a, #7dffb3); }
-        .aforo-range { font-size: 10px; color: rgba(255,255,255,0.35); display: flex; justify-content: space-between; }
-        .aforo-desglose { padding: 12px 20px; display: flex; flex-direction: column; gap: 5px; max-height: 280px; overflow-y: auto; border-bottom: 1px solid rgba(255,255,255,0.12); }
-        .adesglose-title { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #7aaa90; margin-bottom: 4px; }
-        .adesglose-row { font-size: 11px; color: rgba(255,255,255,0.7); padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); line-height: 1.4; }
-        .adesglose-concepto { font-size: 9px; text-transform: uppercase; color: #7aaa90; margin-bottom: 1px; }
-        /* Valor garantia input section */
-        .aforo-valor-section { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.12); }
-        .aforo-valor-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #7aaa90; margin-bottom: 6px; }
-        .aforo-valor-input { width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
-        .aforo-valor-input:focus { border-color: #7dffb3; }
-        .aforo-valor-input::placeholder { color: rgba(255,255,255,0.3); }
-        .aforo-prestable { margin-top: 10px; }
-        .aforo-prestable-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #7aaa90; }
-        .aforo-prestable-value { font-size: 18px; font-weight: 700; color: #7dffb3; margin-top: 2px; }
-        /* PDF button */
-        .aforo-pdf-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 40px); margin: 14px 20px; padding: 11px; background: #b5860d; color: white; border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .aforo-pdf-btn:hover:not(:disabled) { background: #9a6e08; transform: translateY(-1px); }
-        .aforo-pdf-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .aforo-empty { padding: 28px 20px; text-align: center; color: rgba(255,255,255,0.3); font-size: 13px; line-height: 1.6; }
-        .aforo-footer-note { padding: 12px 20px; background: rgba(0,0,0,0.2); font-size: 10px; color: rgba(255,255,255,0.35); line-height: 1.5; }
-      `}</style>
+        .aforo-result-panel { background: linear-gradient(180deg, #0b1d2d 0%, #103457 58%, #15528b 100%); border: 1px solid rgba(58,157,232,0.18); border-radius: var(--radius); overflow: hidden; box-shadow: 0 18px 40px rgba(10,21,32,0.18); color: white; }
+        .aforo-result-header { padding: 18px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.10); }
+        .aforo-result-header h3 { font-family: "Playfair Display", serif; font-size: 20px; color: #ffffff; font-weight: 500; }
+        .aforo-kpis { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.10); }
+        .akpi { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .akpi-label { font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: rgba(255,255,255,0.62); }
+        .akpi-value { font-size: 15px; font-weight: 600; color: #fff; text-align: right; }
+        .akpi-value.big { font-size: 28px; color: #8dd6ff; }
+        .aforo-indicator { padding: 14px 20px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.10); }
+        .aforo-bar-bg { height: 8px; background: rgba(255,255,255,0.14); border-radius: 999px; overflow: hidden; margin: 8px 0 4px; }
+        .aforo-bar-fill { height: 100%; border-radius: 999px; transition: width 0.4s; background: linear-gradient(90deg, #3a9de8, #7fc6ff); }
+        .aforo-range { font-size: 10px; color: rgba(255,255,255,0.42); display: flex; justify-content: space-between; }
+        .aforo-desglose { padding: 14px 20px; display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; border-bottom: 1px solid rgba(255,255,255,0.10); }
+        .adesglose-title { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.58); margin-bottom: 4px; }
+        .adesglose-row { font-size: 11px; color: rgba(255,255,255,0.78); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.06); line-height: 1.4; }
+        .adesglose-concepto { font-size: 9px; text-transform: uppercase; color: rgba(141,214,255,0.82); margin-bottom: 2px; }
+        .aforo-valor-section { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.10); }
+        .aforo-valor-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.58); margin-bottom: 6px; }
+        .aforo-valor-input { width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 10px; color: white; font-family: "IBM Plex Sans", sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        .aforo-valor-input:focus { border-color: #8dd6ff; box-shadow: 0 0 0 4px rgba(141,214,255,0.12); }
+        .aforo-valor-input::placeholder { color: rgba(255,255,255,0.34); }
+        .aforo-prestable { margin-top: 12px; }
+        .aforo-prestable-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.58); }
+        .aforo-prestable-value { font-size: 20px; font-weight: 700; color: #8dd6ff; margin-top: 4px; }
+        .aforo-pdf-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 40px); margin: 16px 20px; padding: 12px; background: linear-gradient(135deg, var(--blue), var(--blue3)); color: white; border: none; border-radius: 10px; font-family: "IBM Plex Sans", sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s; box-shadow: 0 10px 24px rgba(14,95,168,0.22); }
+        .aforo-pdf-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 14px 28px rgba(14,95,168,0.28); }
+        .aforo-pdf-btn:disabled { opacity: 0.42; cursor: not-allowed; box-shadow: none; }
+        .aforo-empty { padding: 30px 20px; text-align: center; color: rgba(255,255,255,0.52); font-size: 13px; line-height: 1.6; }
+        .aforo-footer-note { padding: 12px 20px; background: rgba(0,0,0,0.16); font-size: 10px; color: rgba(255,255,255,0.46); line-height: 1.5; }
+            `}</style>
 
       <div className="aforo-main">
         {/* FORM */}
