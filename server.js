@@ -321,13 +321,37 @@ app.delete('/api/bitacora/gestiones', requireBitacoraAuth, async (req, res) => {
   }
 });
 
-app.get('/api/bitacora/status', (req, res) => {
-  res.json({
-    status: 'ok',
-    storage: USE_POSTGRES ? 'postgres' : 'json-local',
-    authUser: BITACORA_USER
-  });
+
+app.get('/api/bitacora/status', async (req, res) => {
+  try {
+    let connected = false;
+    let databaseTime = null;
+
+    if (USE_POSTGRES) {
+      const { rows } = await pool.query('SELECT NOW() AS now');
+      connected = true;
+      databaseTime = rows?.[0]?.now || null;
+    }
+
+    res.json({
+      status: 'ok',
+      storage: USE_POSTGRES ? 'postgres' : 'json-local',
+      connected: USE_POSTGRES ? connected : true,
+      authUser: BITACORA_USER,
+      databaseTime
+    });
+  } catch (error) {
+    console.error('Bitácora status error:', error);
+    res.status(500).json({
+      status: 'error',
+      storage: USE_POSTGRES ? 'postgres' : 'json-local',
+      connected: false,
+      authUser: BITACORA_USER,
+      error: 'No fue posible validar la conexión de almacenamiento.'
+    });
+  }
 });
+
 
 app.post('/api/analyze', async (req, res) => {
   const apiKey = process.env.ANTHROPIC_API_KEY;
