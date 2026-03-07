@@ -73,21 +73,6 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
   transition: padding 0.28s;
   justify-content: flex-start;
 }
-/* === SIDEBAR COLLAPSED FIXES === */
-.sidebar:not(:hover) .sidebar-logo img {
-  width: 36px !important;
-  height: auto !important;
-  object-fit: contain;
-}
-.sidebar:not(:hover) .nav-item {
-  justify-content: center;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-.sidebar:not(:hover) .nav-icon {
-  margin: 0 auto;
-}
-
 /* nav-item: center icon when collapsed, left-align when expanded */
 .sidebar .nav-item {
   justify-content: flex-start;
@@ -608,19 +593,45 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
 
               <!-- Tasa -->
               <div class="field-group">
-                <div class="field-label">Tasa de interés anual</div>
-                <div class="tiie-row">
-                  <div>
-                    <input type="number" id="inp-tiie" class="calc-input" placeholder="TIIE" step="0.01" min="0" max="50" />
-                    <div class="tiie-hint">TIIE 28d (%)</div>
+                <div class="field-label" style="display:flex;align-items:center;justify-content:space-between">
+                  <span>TIIE 28 días</span>
+                  <button onclick="fetchTIIE()" id="btn-tiie" style="font-size:10px;padding:3px 9px;border:1.5px solid var(--calc-blue);border-radius:6px;background:transparent;color:var(--calc-blue);cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-weight:600;transition:all 0.15s" onmouseover="this.style.background='var(--calc-blue)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='var(--calc-blue)'">
+                    ⟳ Obtener TIIE
+                  </button>
+                </div>
+                <div style="position:relative">
+                  <input type="number" id="inp-tiie" class="calc-input" placeholder="Cargando..." step="0.01" min="0" max="50" oninput="updateTasaTotal()" />
+                  <span id="tiie-status" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--calc-muted)"></span>
+                </div>
+                <div class="tiie-hint" id="tiie-fecha-hint"></div>
+              </div>
+
+              <!-- Destino / Spread -->
+              <div class="field-group">
+                <div class="field-label">Destino del crédito</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+                  <div class="tipo-tab active" id="dest-pyme" onclick="setDestino('pyme',this)" style="font-size:11px;padding:8px 6px">
+                    <span style="display:block;font-size:15px;margin-bottom:2px">🏢</span>PyME<br><span style="font-size:10px;opacity:0.7">+16.40 pts</span>
                   </div>
-                  <div class="tiie-plus">+</div>
-                  <div>
-                    <input type="number" id="inp-spread" class="calc-input" placeholder="Spread" step="0.01" min="0" max="30" />
-                    <div class="tiie-hint">Puntos adicionales</div>
+                  <div class="tipo-tab" id="dest-agro" onclick="setDestino('agro',this)" style="font-size:11px;padding:8px 6px">
+                    <span style="display:block;font-size:15px;margin-bottom:2px">🌾</span>Agro<br><span style="font-size:10px;opacity:0.7">+15.40 pts</span>
+                  </div>
+                  <div class="tipo-tab" id="dest-manual" onclick="setDestino('manual',this)" style="font-size:11px;padding:8px 6px">
+                    <span style="display:block;font-size:15px;margin-bottom:2px">✏️</span>Manual<br><span style="font-size:10px;opacity:0.7">Personalizado</span>
                   </div>
                 </div>
-                <div id="tasa-total-display" style="font-size:12px;color:var(--calc-blue);font-weight:600;margin-top:2px"></div>
+                <div id="spread-manual-wrap" style="display:none;margin-top:8px">
+                  <input type="number" id="inp-spread" class="calc-input" placeholder="Puntos adicionales" step="0.01" min="0" max="30" oninput="updateTasaTotal()" />
+                  <div class="tiie-hint">Spread / puntos sobre TIIE</div>
+                </div>
+                <input type="hidden" id="inp-spread-hidden" value="16.40" />
+              </div>
+
+              <!-- Tasa total display -->
+              <div id="tasa-total-display" style="background:#e8f0fb;border-radius:8px;padding:10px 14px;display:none">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--calc-muted);margin-bottom:4px">Tasa total anual</div>
+                <div id="tasa-total-val" style="font-size:20px;font-weight:700;color:var(--calc-blue);font-family:'IBM Plex Mono',monospace"></div>
+                <div id="tasa-total-breakdown" style="font-size:11px;color:var(--calc-muted);margin-top:3px"></div>
               </div>
 
               <!-- Plazo y periodicidad -->
@@ -943,14 +954,86 @@ function setAmort(a, el) {
 }
 
 // Live tasa display
-document.addEventListener('input', function(e) {
-  if (e.target.id === 'inp-tiie' || e.target.id === 'inp-spread') {
-    var tiie = parseFloat(document.getElementById('inp-tiie').value) || 0;
-    var spread = parseFloat(document.getElementById('inp-spread').value) || 0;
-    var total = tiie + spread;
-    var el = document.getElementById('tasa-total-display');
-    el.textContent = total > 0 ? 'Tasa total: ' + total.toFixed(4) + '% anual' : '';
+// ── DESTINO / SPREAD LOGIC ────────────────────────────────────────────────
+var destinoActual = 'pyme';
+var SPREADS = { pyme: 16.40, agro: 15.40 };
+
+function setDestino(dest, el) {
+  destinoActual = dest;
+  document.querySelectorAll('#dest-pyme,#dest-agro,#dest-manual').forEach(function(x){
+    x.classList.remove('active');
+  });
+  el.classList.add('active');
+  var manualWrap = document.getElementById('spread-manual-wrap');
+  if (dest === 'manual') {
+    manualWrap.style.display = '';
+    document.getElementById('inp-spread-hidden').value = '';
+  } else {
+    manualWrap.style.display = 'none';
+    document.getElementById('inp-spread-hidden').value = SPREADS[dest];
   }
+  updateTasaTotal();
+}
+
+function getSpread() {
+  if (destinoActual === 'manual') {
+    return parseFloat(document.getElementById('inp-spread').value) || 0;
+  }
+  return SPREADS[destinoActual] || 0;
+}
+
+function updateTasaTotal() {
+  var tiie   = parseFloat(document.getElementById('inp-tiie').value) || 0;
+  var spread = getSpread();
+  var total  = tiie + spread;
+  var display = document.getElementById('tasa-total-display');
+  var valEl   = document.getElementById('tasa-total-val');
+  var brkEl   = document.getElementById('tasa-total-breakdown');
+  if (total > 0) {
+    display.style.display = '';
+    valEl.textContent   = total.toFixed(4) + '%';
+    var destLabel = {pyme:'PyME',agro:'Agro',manual:'Manual'}[destinoActual] || '';
+    brkEl.textContent = 'TIIE ' + tiie.toFixed(4) + '% + ' + spread.toFixed(4) + ' pts (' + destLabel + ')';
+  } else {
+    display.style.display = 'none';
+  }
+}
+
+// ── TIIE FETCH ─────────────────────────────────────────────────────────────
+async function fetchTIIE() {
+  var btn = document.getElementById('btn-tiie');
+  var inp = document.getElementById('inp-tiie');
+  var status = document.getElementById('tiie-status');
+  var hint   = document.getElementById('tiie-fecha-hint');
+  btn.textContent = '⟳ Consultando...';
+  btn.disabled = true;
+  status.textContent = '...';
+  try {
+    var res  = await fetch('/api/tiie');
+    var data = await res.json();
+    if (data.tiie) {
+      inp.value = data.tiie;
+      status.textContent = '✓';
+      status.style.color = 'var(--calc-green)';
+      hint.textContent   = data.fecha ? 'Vigente al ' + data.fecha + ' · DOF' : 'Fuente: DOF';
+      hint.style.color   = 'var(--calc-green)';
+      updateTasaTotal();
+    } else {
+      throw new Error(data.error || 'Sin dato');
+    }
+  } catch(e) {
+    status.textContent = '✕ Error';
+    status.style.color = 'var(--calc-red)';
+    hint.textContent   = 'No se pudo obtener la TIIE. Ingresa manualmente.';
+    hint.style.color   = 'var(--calc-red)';
+  }
+  btn.textContent = '⟳ Obtener TIIE';
+  btn.disabled = false;
+}
+
+// Auto-fetch TIIE on load
+window.addEventListener('load', function() {
+  setTimeout(fetchTIIE, 800);
 });
 
 // Set today as default date
@@ -964,7 +1047,7 @@ document.addEventListener('input', function(e) {
 function calcular() {
   var monto      = parseMoney(document.getElementById('inp-monto').value);
   var tiie       = parseFloat(document.getElementById('inp-tiie').value)        || 0;
-  var spread     = parseFloat(document.getElementById('inp-spread').value)      || 0;
+  var spread     = getSpread();
   var plazoRaw   = parseInt(document.getElementById('inp-plazo').value)         || 0;
   var unidad     = document.getElementById('inp-unidad').value;
   var periodoInt = document.getElementById('inp-periodo-interes').value;
@@ -1220,7 +1303,7 @@ function exportExcel() {
   if (!tablaData.length) return;
   var monto  = parseMoney(document.getElementById('inp-monto').value);
   var tiie   = parseFloat(document.getElementById('inp-tiie').value)||0;
-  var spread = parseFloat(document.getElementById('inp-spread').value)||0;
+  var spread = getSpread();
   var plazo  = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
   var periodo= document.getElementById('inp-periodo-interes').value;
   var periodoCap = document.getElementById('inp-periodo-capital').value;
