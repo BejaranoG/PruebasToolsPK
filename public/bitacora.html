@@ -857,8 +857,10 @@ const { useState, useEffect, useCallback, useMemo, useRef } = React;
 
 
 // ─── CONFIG ───
-const CREDENTIALS = { user: "gerardo.bejarano", pass: "Proaktiva2026!" };
 const EXEC_NAME = "Gerardo Emiliano Bejarano Ruiz";
+const LEGACY_STORAGE_KEY = "gestiones-historico";
+const AUTH_TOKEN_KEY = "bitacora-auth-token";
+const API_BASE = "";
 
 const DROPDOWN_OPTIONS = {
   clasificacion: ["A", "B", "C"],
@@ -1069,6 +1071,7 @@ html[data-theme="dark"] .login-card {
 }
 
 .login-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+.login-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
 .login-error {
   background: rgba(239,68,68,0.1);
@@ -1761,20 +1764,85 @@ async function exportToXLSX(gestiones, filename) {
 }
 
 // ─── STORAGE HELPERS ───
-const STORAGE_KEY = "gestiones-historico";
-const CARTERA_KEY = "cartera-data";
-
-async function loadGestiones() {
-  try {
-    const v = localStorage.getItem(STORAGE_KEY);
-    return v ? JSON.parse(v) : [];
-  } catch { return []; }
+function getAuthToken() {
+  try { return localStorage.getItem(AUTH_TOKEN_KEY) || ""; } catch { return ""; }
 }
 
-async function saveGestiones(data) {
+function setAuthToken(token) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch (e) { console.error("Save error:", e); }
+    if (token) localStorage.setItem(AUTH_TOKEN_KEY, token);
+    else localStorage.removeItem(AUTH_TOKEN_KEY);
+  } catch {}
+}
+
+async function apiFetch(url, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (options.body && !headers["Content-Type"]) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  const token = getAuthToken();
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const response = await fetch(API_BASE + url, { ...options, headers });
+  let data = null;
+  try { data = await response.json(); } catch {}
+
+  if (!response.ok) {
+    const error = new Error(data?.error || `Error HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+
+  return data;
+}
+
+function getLegacyGestiones() {
+  try {
+    const raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+async function loginBitacora(user, pass) {
+  const data = await apiFetch("/api/bitacora/login", {
+    method: "POST",
+    body: JSON.stringify({ user, pass })
+  });
+
+  if (!data?.token) {
+    throw new Error("No se recibió token de sesión");
+  }
+
+  setAuthToken(data.token);
+  return data;
+}
+
+async function loadGestiones() {
+  const data = await apiFetch("/api/bitacora/gestiones");
+  return Array.isArray(data?.gestiones) ? data.gestiones : [];
+}
+
+async function createGestion(record) {
+  const data = await apiFetch("/api/bitacora/gestiones", {
+    method: "POST",
+    body: JSON.stringify(record)
+  });
+  return data?.gestion || record;
+}
+
+async function clearGestionesCloud() {
+  await apiFetch("/api/bitacora/gestiones", { method: "DELETE" });
+}
+
+async function importLegacyGestiones(gestiones) {
+  const data = await apiFetch("/api/bitacora/gestiones/import", {
+    method: "POST",
+    body: JSON.stringify({ gestiones })
+  });
+  return Array.isArray(data?.gestiones) ? data.gestiones : [];
 }
 
 // ─── COMPONENTS ───
@@ -1787,16 +1855,23 @@ function Toast({ message, type, onClose }) {
   return <div className={`toast ${type}`}>{type === "success" ? "✓" : "✕"} {message}</div>;
 }
 
-function LoginScreen({ onLogin }) {
+function LoginScreen({ onLogin, loadingSession = false }) {
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleLogin = () => {
-    if (user === CREDENTIALS.user && pass === CREDENTIALS.pass) {
-      onLogin();
-    } else {
-      setError("Credenciales incorrectas");
+  const handleLogin = async () => {
+    if (submitting || loadingSession) return;
+
+    try {
+      setError("");
+      setSubmitting(true);
+      await onLogin(user.trim(), pass);
+    } catch (e) {
+      setError(e?.message || "No fue posible iniciar sesión");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -1818,7 +1893,9 @@ function LoginScreen({ onLogin }) {
           value={pass} onChange={e => { setPass(e.target.value); setError(""); }}
           onKeyDown={e => e.key === "Enter" && handleLogin()}
         />
-        <button className="login-btn" onClick={handleLogin}>Iniciar Sesión</button>
+        <button className="login-btn" onClick={handleLogin} disabled={submitting || loadingSession}>
+          {loadingSession ? "Validando..." : submitting ? "Ingresando..." : "Iniciar Sesión"}
+        </button>
       </div>
     </div>
   );
@@ -2253,7 +2330,8 @@ function App() {
   const [carteraFileName, setCarteraFileName] = useState("");
   const [gestiones, setGestiones] = useState([]);
   const [toastData, setToastData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [authChecking, setAuthChecking] = useState(true);
   const [dragOver, setDragOver] = useState(false);
   const fileRef = useRef(null);
 
@@ -2261,14 +2339,62 @@ function App() {
     setToastData({ msg, type });
   }, []);
 
-  // Load stored gestiones
+  const hydrateGestiones = useCallback(async () => {
+    const cloudGestiones = await loadGestiones();
+    const legacyGestiones = getLegacyGestiones();
+
+    if (cloudGestiones.length === 0 && legacyGestiones.length > 0) {
+      const shouldMigrate = window.confirm(
+        `Se encontraron ${legacyGestiones.length} gestiones guardadas solo en este dispositivo. ¿Deseas migrarlas a la nube para consultarlas desde cualquier equipo?`
+      );
+
+      if (shouldMigrate) {
+        const migrated = await importLegacyGestiones(legacyGestiones);
+        try {
+          localStorage.setItem(LEGACY_STORAGE_KEY + "-backup", JSON.stringify(legacyGestiones));
+          localStorage.removeItem(LEGACY_STORAGE_KEY);
+        } catch {}
+        showToast(`Se migraron ${migrated.length} gestiones a la nube`, "success");
+        return migrated;
+      }
+    }
+
+    return cloudGestiones;
+  }, [showToast]);
+
   useEffect(() => {
     (async () => {
-      const stored = await loadGestiones();
-      setGestiones(stored);
-      setLoading(false);
+      try {
+        const token = getAuthToken();
+        if (!token) return;
+
+        setLoading(true);
+        const remoteGestiones = await hydrateGestiones();
+        setGestiones(remoteGestiones);
+        setLoggedIn(true);
+      } catch (e) {
+        setAuthToken("");
+        setGestiones([]);
+        setLoggedIn(false);
+      } finally {
+        setLoading(false);
+        setAuthChecking(false);
+      }
     })();
-  }, []);
+  }, [hydrateGestiones]);
+
+  const handleLogin = useCallback(async (user, pass) => {
+    setLoading(true);
+    try {
+      await loginBitacora(user, pass);
+      const remoteGestiones = await hydrateGestiones();
+      setGestiones(remoteGestiones);
+      setLoggedIn(true);
+    } finally {
+      setLoading(false);
+      setAuthChecking(false);
+    }
+  }, [hydrateGestiones]);
 
   const processCartera = useCallback(async (file) => {
     try {
@@ -2374,24 +2500,51 @@ function App() {
   }, [processCartera, showToast]);
 
   const handleSaveGestion = useCallback(async (record) => {
-    const updated = [record, ...gestiones];
-    setGestiones(updated);
-    await saveGestiones(updated);
-    showToast("Gestión registrada exitosamente", "success");
-  }, [gestiones, showToast]);
+    try {
+      setLoading(true);
+      const saved = await createGestion(record);
+      setGestiones(prev => [saved, ...prev.filter(g => g.id !== saved.id)]);
+      showToast("Gestión registrada exitosamente", "success");
+    } catch (e) {
+      if (e?.status === 401) {
+        setAuthToken("");
+        setLoggedIn(false);
+        setGestiones([]);
+        showToast("Tu sesión expiró. Inicia sesión nuevamente.", "error");
+        return;
+      }
+      showToast("No fue posible guardar la gestión: " + (e?.message || "Error desconocido"), "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [showToast]);
 
   const handleDeleteAll = useCallback(async () => {
     if (confirm("¿Estás seguro de eliminar TODAS las gestiones? Esta acción no se puede deshacer.")) {
-      setGestiones([]);
-      await saveGestiones([]);
-      showToast("Todas las gestiones fueron eliminadas", "success");
+      try {
+        setLoading(true);
+        await clearGestionesCloud();
+        setGestiones([]);
+        showToast("Todas las gestiones fueron eliminadas", "success");
+      } catch (e) {
+        if (e?.status === 401) {
+          setAuthToken("");
+          setLoggedIn(false);
+          setGestiones([]);
+          showToast("Tu sesión expiró. Inicia sesión nuevamente.", "error");
+          return;
+        }
+        showToast("No fue posible eliminar las gestiones: " + (e?.message || "Error desconocido"), "error");
+      } finally {
+        setLoading(false);
+      }
     }
   }, [showToast]);
 
   if (!loggedIn) return (
     <>
       <style>{css}</style>
-      <LoginScreen onLogin={() => setLoggedIn(true)} />
+      <LoginScreen onLogin={handleLogin} loadingSession={authChecking || loading} />
     </>
   );
 
@@ -2420,7 +2573,7 @@ function App() {
               <div className="user-avatar">GB</div>
               <span>Gerardo B.</span>
             </div>
-            <button className="logout-btn" onClick={() => setLoggedIn(false)}>Cerrar Sesión</button>
+            <button className="logout-btn" onClick={() => { setAuthToken(""); setLoggedIn(false); setGestiones([]); }}>Cerrar Sesión</button>
           </div>
         </header>
 
