@@ -885,7 +885,6 @@ const AUTH_TOKEN_KEY = "bitacora-auth-token";
 const API_BASE = "";
 
 const DROPDOWN_OPTIONS = {
-  clasificacion: ["A", "B", "C"],
   reincidente: ["Si", "No"],
   etapa: ["ETAPA 1", "ETAPA 2", "ETAPA 3"],
   areaResponsable: ["RECUPERACION", "COMERCIAL"],
@@ -1902,13 +1901,13 @@ async function parseXLSX(file) {
 
 async function exportToXLSX(gestiones, filename) {
   const headers = [
-    "Folio Cliente", "Fecha de Gestión", "Ejecutivo", "Cliente", "Clasificación",
+    "Folio Cliente", "Fecha de Gestión", "Ejecutivo", "Cliente",
     "Reincidente", "Etapa", "Monto en Impago Total", "Área Responsable", "Saldo Neto Total",
     "Tipo de Gestión", "Impago", "Estado de la Gestión", "Fecha Compromiso de Pago",
     "Toque", "Siguiente Acción", "Prioridad", "Comentario"
   ];
   const rows = gestiones.map(g => [
-    g.folioCliente, g.fechaGestion, g.ejecutivo, g.cliente, g.clasificacion,
+    g.folioCliente, g.fechaGestion, g.ejecutivo, g.cliente,
     g.reincidente, g.etapa, g.montoImpago, g.areaResponsable, g.saldoNeto,
     g.tipoGestion, g.impago, g.estadoGestion, g.fechaCompromiso,
     g.toque, g.siguienteAccion, g.prioridad, g.comentario
@@ -1916,7 +1915,7 @@ async function exportToXLSX(gestiones, filename) {
   const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
   
   // Column widths
-  ws["!cols"] = headers.map((h, i) => ({ wch: i === 17 ? 50 : Math.max(h.length + 4, 16) }));
+  ws["!cols"] = headers.map((h, i) => ({ wch: i === 16 ? 50 : Math.max(h.length + 4, 16) }));
   
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Gestiones");
@@ -2132,7 +2131,8 @@ function ClientSelector({ clients, selected, onSelect, onClear }) {
 function RegistroView({ carteraClients, gestiones, onSave, toast }) {
   const [selected, setSelected] = useState(null);
   const [form, setForm] = useState({
-    clasificacion: "", reincidente: "", areaResponsable: "",
+    fechaGestion: todayStr(),
+    reincidente: "", areaResponsable: "",
     tipoGestion: "", impago: "", estadoGestion: "",
     fechaCompromiso: "", fechaCompromisoDate: "", siguienteAccion: "",
     siguienteAccionDate: "", prioridad: "", comentario: ""
@@ -2152,7 +2152,7 @@ function RegistroView({ carteraClients, gestiones, onSave, toast }) {
 
   const toqueDisplay = calculatedToque > 4 ? "+4" : String(calculatedToque);
 
-  const canSubmit = selected && form.clasificacion && form.tipoGestion && form.estadoGestion && form.prioridad;
+  const canSubmit = selected && form.fechaGestion && form.tipoGestion && form.estadoGestion && form.prioridad;
 
   useEffect(() => {
     if (!selected) return;
@@ -2168,10 +2168,9 @@ function RegistroView({ carteraClients, gestiones, onSave, toast }) {
     const record = {
       id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
       folioCliente: selected.folio,
-      fechaGestion: todayStr(),
+      fechaGestion: form.fechaGestion || todayStr(),
       ejecutivo: selected.ejecutivo || EXEC_NAME,
       cliente: selected.nombre,
-      clasificacion: form.clasificacion,
       reincidente: form.reincidente || "No",
       etapa: selected.etapa,
       montoImpago: selected.montoImpago,
@@ -2192,7 +2191,8 @@ function RegistroView({ carteraClients, gestiones, onSave, toast }) {
 
     onSave(record);
     setForm({
-      clasificacion: "", reincidente: "", areaResponsable: "",
+      fechaGestion: todayStr(),
+      reincidente: "", areaResponsable: "",
       tipoGestion: "", impago: "", estadoGestion: "",
       fechaCompromiso: "", fechaCompromisoDate: "", siguienteAccion: "",
       siguienteAccionDate: "", prioridad: "", comentario: ""
@@ -2225,7 +2225,11 @@ function RegistroView({ carteraClients, gestiones, onSave, toast }) {
               <div className="form-grid" style={{ marginBottom: 20 }}>
                 <div className="form-group">
                   <label>Fecha de Gestión</label>
-                  <div className="auto-value">{todayStr()}</div>
+                  <input
+                    type="date"
+                    value={form.fechaGestion}
+                    onChange={e => set("fechaGestion", e.target.value)}
+                  />
                 </div>
                 <div className="form-group">
                   <label>Ejecutivo</label>
@@ -2262,7 +2266,6 @@ function RegistroView({ carteraClients, gestiones, onSave, toast }) {
               {/* Manual fields */}
               <div className="form-grid">
                 {[
-                  ["clasificacion", "Clasificación", DROPDOWN_OPTIONS.clasificacion],
                   ["reincidente", "Reincidente", DROPDOWN_OPTIONS.reincidente],
                   ["areaResponsable", "Área Responsable", DROPDOWN_OPTIONS.areaResponsable],
                   ["tipoGestion", "Tipo de Gestión", DROPDOWN_OPTIONS.tipoGestion],
@@ -2299,7 +2302,7 @@ function RegistroView({ carteraClients, gestiones, onSave, toast }) {
 
               <div className="btn-row">
                 <button className="btn btn-secondary" onClick={() => {
-                  setForm({ clasificacion: "", reincidente: "", areaResponsable: "", tipoGestion: "", impago: "", estadoGestion: "", fechaCompromiso: "", fechaCompromisoDate: "", siguienteAccion: "", siguienteAccionDate: "", prioridad: "", comentario: "" });
+                  setForm({ fechaGestion: todayStr(), reincidente: "", areaResponsable: "", tipoGestion: "", impago: "", estadoGestion: "", fechaCompromiso: "", fechaCompromisoDate: "", siguienteAccion: "", siguienteAccionDate: "", prioridad: "", comentario: "" });
                 }}>Limpiar</button>
                 <button className="btn btn-primary" disabled={!canSubmit} onClick={handleSubmit}>
                   Registrar Gestión
