@@ -1703,6 +1703,41 @@ function formatMoney(n) {
   return "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function parseNumericValue(value) {
+  if (value == null || value === "") return 0;
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (typeof value === "boolean") return value ? 1 : 0;
+
+  let str = String(value).trim();
+  if (!str) return 0;
+
+  const isNegativeByParens = /^\(.*\)$/.test(str);
+  str = str.replace(/[\$\s]/g, "").replace(/[()]/g, "");
+
+  if (str.includes(",") && str.includes(".")) {
+    if (str.lastIndexOf(",") > str.lastIndexOf(".")) {
+      str = str.replace(/\./g, "").replace(/,/g, ".");
+    } else {
+      str = str.replace(/,/g, "");
+    }
+  } else if (str.includes(",")) {
+    const parts = str.split(",");
+    if (parts.length === 2 && parts[1].length <= 2) {
+      str = parts[0].replace(/\./g, "") + "." + parts[1];
+    } else {
+      str = str.replace(/,/g, "");
+    }
+  }
+
+  const parsed = Number(str.replace(/[^0-9.-]/g, ""));
+  if (!Number.isFinite(parsed)) return 0;
+  return isNegativeByParens ? -Math.abs(parsed) : parsed;
+}
+
+function hasImpago(value) {
+  return parseNumericValue(value) > 0.1;
+}
+
 function formatDate(d) {
   if (!d) return "";
   if (d instanceof Date) {
@@ -2009,7 +2044,7 @@ function RegistroView({ carteraClients, gestiones, onSave, toast }) {
       areaResponsable: form.areaResponsable || "RECUPERACION",
       saldoNeto: selected.saldoNeto,
       tipoGestion: form.tipoGestion,
-      impago: form.impago || (selected.montoImpago > 0 ? "Si" : "No"),
+      impago: form.impago || (hasImpago(selected.montoImpago) ? "Si" : "No"),
       estadoGestion: form.estadoGestion,
       fechaCompromiso: fechaComp || "N/A",
       toque: toqueDisplay,
@@ -2044,8 +2079,17 @@ function RegistroView({ carteraClients, gestiones, onSave, toast }) {
           <ClientSelector
             clients={carteraClients}
             selected={selected}
-            onSelect={setSelected}
-            onClear={() => setSelected(null)}
+            onSelect={(client) => {
+              setSelected(client);
+              setForm(f => ({
+                ...f,
+                impago: hasImpago(client?.montoImpago) ? "Si" : "No"
+              }));
+            }}
+            onClear={() => {
+              setSelected(null);
+              setForm(f => ({ ...f, impago: "" }));
+            }}
           />
 
           {selected && (
@@ -2438,7 +2482,7 @@ function App() {
         colMap.status = headers.findIndex((h, i) => i !== colMap.folio && h === "STATUS");
       }
 
-      // Aggregate by folio (sum amounts across dispositions)
+      // Aggregate by folio cliente (sum amounts across all its dispositions)
       const clientMap = {};
       for (let i = headerIdx + 1; i < rows.length; i++) {
         const row = rows[i];
@@ -2457,14 +2501,14 @@ function App() {
             status: String(row[colMap.status] || "").trim(),
             statusCobranza: colMap.statusCobranza >= 0 ? String(row[colMap.statusCobranza] || "").trim() : "",
             etapa: colMap.ifrs9 >= 0 ? String(row[colMap.ifrs9] || "").trim() : "",
-            diasImpago: colMap.diasImpago >= 0 ? Number(row[colMap.diasImpago]) || 0 : 0,
+            diasImpago: colMap.diasImpago >= 0 ? parseNumericValue(row[colMap.diasImpago]) : 0,
             montoImpago: 0,
             saldoNeto: 0,
           };
         }
 
-        const impago = colMap.saldoCapitalImpago >= 0 ? Number(row[colMap.saldoCapitalImpago]) || 0 : 0;
-        const neto = colMap.saldoNeto >= 0 ? Number(row[colMap.saldoNeto]) || 0 : 0;
+        const impago = colMap.saldoCapitalImpago >= 0 ? parseNumericValue(row[colMap.saldoCapitalImpago]) : 0;
+        const neto = colMap.saldoNeto >= 0 ? parseNumericValue(row[colMap.saldoNeto]) : 0;
         clientMap[folio].montoImpago += impago;
         clientMap[folio].saldoNeto += neto;
 
@@ -2473,7 +2517,7 @@ function App() {
         if (currentEtapa.includes("3")) clientMap[folio].etapa = "ETAPA 3";
         else if (currentEtapa.includes("2") && !clientMap[folio].etapa.includes("3")) clientMap[folio].etapa = "ETAPA 2";
 
-        const dias = colMap.diasImpago >= 0 ? Number(row[colMap.diasImpago]) || 0 : 0;
+        const dias = colMap.diasImpago >= 0 ? parseNumericValue(row[colMap.diasImpago]) : 0;
         if (dias > clientMap[folio].diasImpago) clientMap[folio].diasImpago = dias;
       }
 
