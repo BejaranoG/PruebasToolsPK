@@ -6,6 +6,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>ToolsPK — Proaktiva</title>
+<script>
+(function(){
+  try {
+    var saved = localStorage.getItem('toolspk-theme');
+    var theme = saved === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <!-- Pagare dependencies -->
@@ -227,8 +238,334 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
 
 /* ── AFORO TOOL WRAPPER ── */
 #panel-aforo .panel-scroll { background: #f5f2ed; }
+
+
+/* ══════════════════════════════════════════════
+   THEME TOGGLE — LIGHT / DARK
+══════════════════════════════════════════════ */
+html {
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #0f1a27;
+  --surface2: #0b1420;
+  --border: #22384f;
+  --ink: #e8f1fb;
+  --muted: #9bb1c8;
+  --shadow: 0 12px 30px rgba(0,0,0,0.32);
+}
+body {
+  background: var(--surface2);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+.main,
+.main-content,
+.panels,
+.panel,
+.panel-scroll {
+  background: var(--surface2);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+.tool-header,
+.tool-card,
+.card,
+.panel-card,
+.results-card,
+.summary-card,
+.content-card,
+.section-card,
+.info-card,
+.upload-box,
+.drop-zone,
+.table-wrap,
+.sheet-card,
+.form-card,
+.metric-card,
+.resume-card,
+.report-card,
+.preview-card,
+.modal-content {
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+html[data-theme="dark"] .tool-header,
+html[data-theme="dark"] .tool-card,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .panel-card,
+html[data-theme="dark"] .results-card,
+html[data-theme="dark"] .summary-card,
+html[data-theme="dark"] .content-card,
+html[data-theme="dark"] .section-card,
+html[data-theme="dark"] .info-card,
+html[data-theme="dark"] .upload-box,
+html[data-theme="dark"] .drop-zone,
+html[data-theme="dark"] .table-wrap,
+html[data-theme="dark"] .sheet-card,
+html[data-theme="dark"] .form-card,
+html[data-theme="dark"] .metric-card,
+html[data-theme="dark"] .resume-card,
+html[data-theme="dark"] .report-card,
+html[data-theme="dark"] .preview-card,
+html[data-theme="dark"] .modal-content {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow);
+}
+html[data-theme="dark"] .home-header {
+  background: linear-gradient(105deg, #08121d 0%, #0b2847 58%, #0f4b86 100%) !important;
+}
+html[data-theme="dark"] .home-header::after {
+  background: radial-gradient(circle, rgba(58,157,232,0.18) 0%, transparent 72%) !important;
+}
+html[data-theme="dark"] .tool-card-icon.blue {
+  background: linear-gradient(135deg, rgba(14,95,168,0.28), rgba(58,157,232,0.18)) !important;
+}
+html[data-theme="dark"] .tool-card-icon.gold {
+  background: linear-gradient(135deg, rgba(201,146,42,0.22), rgba(201,146,42,0.10)) !important;
+}
+html[data-theme="dark"] .tool-card-tag.ai {
+  background: rgba(14,95,168,0.22) !important;
+  color: #8ec7ff !important;
+}
+html[data-theme="dark"] .tool-card-tag.calc {
+  background: rgba(201,146,42,0.16) !important;
+  color: #f1cb7f !important;
+}
+html[data-theme="dark"] .tool-card-arrow {
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--muted) !important;
+}
+html[data-theme="dark"] .tool-card:hover .tool-card-arrow {
+  background: var(--blue) !important;
+  color: #fff !important;
+}
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  background: #0b1623 !important;
+  color: var(--ink) !important;
+  border-color: var(--border) !important;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #7f97b0 !important;
+}
+html[data-theme="dark"] button,
+html[data-theme="dark"] .btn,
+html[data-theme="dark"] .back-btn {
+  border-color: var(--border);
+}
+html[data-theme="dark"] .back-btn {
+  background: rgba(255,255,255,0.03) !important;
+  color: var(--ink) !important;
+}
+html[data-theme="dark"] table,
+html[data-theme="dark"] th,
+html[data-theme="dark"] td {
+  border-color: var(--border) !important;
+  color: var(--ink) !important;
+}
+html[data-theme="dark"] th {
+  background: rgba(58,157,232,0.12) !important;
+}
+html[data-theme="dark"] tr:nth-child(even) td {
+  background: rgba(255,255,255,0.02) !important;
+}
+html[data-theme="dark"] .sidebar {
+  box-shadow: inset -1px 0 0 rgba(255,255,255,0.05);
+}
+.theme-toggle {
+  width: calc(100% - 16px);
+  margin: 8px;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.92);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.16);
+}
+.theme-toggle:active {
+  transform: scale(0.98);
+}
+.theme-toggle-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.09);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.theme-toggle-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.theme-toggle-label {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.theme-toggle-state {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.48);
+  margin-top: 2px;
+}
+.sidebar:not(:hover) .theme-toggle {
+  width: 42px;
+  height: 42px;
+  margin: 8px auto;
+  padding: 0;
+  justify-content: center;
+}
+.sidebar:not(:hover) .theme-toggle-copy {
+  display: none;
+}
+html[data-theme="dark"] #panel-pagare .panel-scroll,
+html[data-theme="dark"] #panel-aforo .panel-scroll,
+html[data-theme="dark"] #panel-calc .panel-scroll,
+html[data-theme="dark"] #panel-bitacora .panel-scroll {
+  background: var(--surface2) !important;
+}
+@media (max-width: 768px) {
+  .theme-toggle {
+    width: calc(100% - 16px) !important;
+    height: auto !important;
+    margin: 8px !important;
+    padding: 10px 12px !important;
+    justify-content: flex-start !important;
+  }
+  .theme-toggle-copy {
+    display: flex !important;
+  }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style id="toolspk-theme-floating-patch">
+/* ═══════════════════════════════════════════════════
+   TOOLSPK — PATCH FLOATING THEME + ICON ALIGNMENT
+═══════════════════════════════════════════════════ */
+.sidebar .nav-item {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.sidebar .nav-icon {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: 0 0 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 1 !important;
+}
+
+.sidebar .nav-glyph {
+  width: 1.15em;
+  height: 1.15em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
+  font-style: normal;
+}
+
+.sidebar:not(:hover) .nav-item {
+  justify-content: center !important;
+  gap: 0 !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+.sidebar:not(:hover) .nav-icon {
+  margin: 0 auto !important;
+}
+
+.theme-toggle,
+.sidebar:not(:hover) .theme-toggle {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: 20px !important;
+  left: auto !important;
+  width: auto !important;
+  min-width: 180px;
+  max-width: calc(100vw - 32px);
+  height: 50px !important;
+  margin: 0 !important;
+  padding: 10px 14px !important;
+  justify-content: flex-start !important;
+  border-radius: 14px !important;
+  z-index: 9999 !important;
+  box-shadow: 0 14px 34px rgba(10, 21, 32, 0.22), 0 4px 14px rgba(14,95,168,0.12) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.theme-toggle-copy,
+.sidebar:not(:hover) .theme-toggle-copy {
+  display: flex !important;
+}
+
+html[data-theme="light"] .theme-toggle {
+  background: rgba(255,255,255,0.92) !important;
+  color: var(--ink) !important;
+  border: 1px solid rgba(14,95,168,0.12) !important;
+}
+
+html[data-theme="light"] .theme-toggle-icon {
+  background: rgba(14,95,168,0.08) !important;
+}
+
+html[data-theme="light"] .theme-toggle-state {
+  color: var(--muted) !important;
+}
+
+html[data-theme="dark"] .theme-toggle {
+  background: rgba(15,26,39,0.92) !important;
+  color: rgba(255,255,255,0.94) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+html[data-theme="dark"] .theme-toggle-icon {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+html[data-theme="dark"] .theme-toggle-state {
+  color: rgba(255,255,255,0.52) !important;
+}
+
+@media (max-width: 768px) {
+  .theme-toggle,
+  .sidebar:not(:hover) .theme-toggle {
+    right: 16px !important;
+    bottom: 16px !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+}
+</style>
+
 </head>
 <!-- Pagare CSS scoped -->
 <style>
@@ -558,26 +895,35 @@ body { background: var(--bg); color: var(--ink); font-family: "IBM Plex Sans", s
     <div class="sidebar-section">Herramientas</div>
 
     <div class="nav-item" id="nav-home" onclick="window.location.href='/index.html'">
-      <div class="nav-icon">🏠</div>
+      <div class="nav-icon"><span class="nav-glyph">🏠</span></div>
       <span>Inicio</span>
     </div>
     <div class="nav-item" id="nav-pagare" class="nav-item active" onclick="window.location.href='/pagare.html'">
-      <div class="nav-icon">📋</div>
+      <div class="nav-icon"><span class="nav-glyph">📋</span></div>
       <span>Revisión de Pagarés</span>
       <span class="nav-badge">IA</span>
     </div>
     <div class="nav-item" id="nav-aforo" onclick="window.location.href='/aforo.html'">
-      <div class="nav-icon">🏦</div>
+      <div class="nav-icon"><span class="nav-glyph">🏦</span></div>
       <span>Aforo de Garantía</span>
     </div>
     <div class="nav-item" id="nav-calc" onclick="window.location.href='/calc.html'">
-      <div class="nav-icon">🧮</div>
+      <div class="nav-icon"><span class="nav-glyph">🧮</span></div>
       <span>Calculadora de Crédito</span>
     </div>
     <div class="nav-item" id="nav-bitacora" onclick="window.location.href='/bitacora.html'">
-      <div class="nav-icon">📒</div>
+      <div class="nav-icon"><span class="nav-glyph">📒</span></div>
       <span>Bitácora de Gestiones</span>
     </div>
+
+    
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Cambiar entre modo claro y modo oscuro">
+      <span class="theme-toggle-icon" id="themeToggleIcon">☀️</span>
+      <span class="theme-toggle-copy">
+        <span class="theme-toggle-label">Apariencia</span>
+        <span class="theme-toggle-state" id="themeToggleState">Modo claro</span>
+      </span>
+    </button>
 
     <div class="sidebar-spacer"></div>
     <div class="sidebar-footer">ToolsPK v1.0 · Proaktiva</div>
@@ -1341,6 +1687,39 @@ document.querySelectorAll('.nav-item').forEach(function(item) {
     if (window.innerWidth <= 768) closeSidebar();
   });
 });
+</script>
+
+<script>
+(function () {
+  var storageKey = 'toolspk-theme';
+
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+
+  function updateThemeButton() {
+    var icon = document.getElementById('themeToggleIcon');
+    var state = document.getElementById('themeToggleState');
+    var btn = document.getElementById('themeToggle');
+    var dark = currentTheme() === 'dark';
+    if (icon) icon.textContent = dark ? '🌙' : '☀️';
+    if (state) state.textContent = dark ? 'Modo oscuro' : 'Modo claro';
+    if (btn) btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+  }
+
+  window.toggleToolsPKTheme = function () {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem(storageKey, next); } catch (e) {}
+    updateThemeButton();
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('themeToggle');
+    if (btn) btn.addEventListener('click', window.toggleToolsPKTheme);
+    updateThemeButton();
+  });
+})();
 </script>
 </body>
 </html>

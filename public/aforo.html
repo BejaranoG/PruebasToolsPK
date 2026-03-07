@@ -6,6 +6,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <title>ToolsPK — Proaktiva</title>
+<script>
+(function(){
+  try {
+    var saved = localStorage.getItem('toolspk-theme');
+    var theme = saved === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <!-- Pagare dependencies -->
@@ -226,7 +237,7 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
 #panel-pagare .panel-scroll { background: #eef3f8; }
 
 /* ── AFORO TOOL WRAPPER ── */
-#panel-aforo .panel-scroll { background: #f5f2ed; }
+#panel-aforo .panel-scroll { background: var(--surface2); }
 
 /* ══════════════════════════════════════════════
    RESPONSIVE — MOBILE
@@ -280,8 +291,458 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
   .tool-card-title { font-size: 14px; }
 }
 
+
+
+/* ══════════════════════════════════════════════
+   THEME TOGGLE — LIGHT / DARK
+══════════════════════════════════════════════ */
+html {
+  color-scheme: light;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #0f1a27;
+  --surface2: #0b1420;
+  --border: #22384f;
+  --ink: #e8f1fb;
+  --muted: #9bb1c8;
+  --shadow: 0 12px 30px rgba(0,0,0,0.32);
+}
+body {
+  background: var(--surface2);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+.main,
+.main-content,
+.panels,
+.panel,
+.panel-scroll {
+  background: var(--surface2);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+.tool-header,
+.tool-card,
+.card,
+.panel-card,
+.results-card,
+.summary-card,
+.content-card,
+.section-card,
+.info-card,
+.upload-box,
+.drop-zone,
+.table-wrap,
+.sheet-card,
+.form-card,
+.metric-card,
+.resume-card,
+.report-card,
+.preview-card,
+.modal-content {
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+html[data-theme="dark"] .tool-header,
+html[data-theme="dark"] .tool-card,
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .panel-card,
+html[data-theme="dark"] .results-card,
+html[data-theme="dark"] .summary-card,
+html[data-theme="dark"] .content-card,
+html[data-theme="dark"] .section-card,
+html[data-theme="dark"] .info-card,
+html[data-theme="dark"] .upload-box,
+html[data-theme="dark"] .drop-zone,
+html[data-theme="dark"] .table-wrap,
+html[data-theme="dark"] .sheet-card,
+html[data-theme="dark"] .form-card,
+html[data-theme="dark"] .metric-card,
+html[data-theme="dark"] .resume-card,
+html[data-theme="dark"] .report-card,
+html[data-theme="dark"] .preview-card,
+html[data-theme="dark"] .modal-content {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow);
+}
+html[data-theme="dark"] .home-header {
+  background: linear-gradient(105deg, #08121d 0%, #0b2847 58%, #0f4b86 100%) !important;
+}
+html[data-theme="dark"] .home-header::after {
+  background: radial-gradient(circle, rgba(58,157,232,0.18) 0%, transparent 72%) !important;
+}
+html[data-theme="dark"] .tool-card-icon.blue {
+  background: linear-gradient(135deg, rgba(14,95,168,0.28), rgba(58,157,232,0.18)) !important;
+}
+html[data-theme="dark"] .tool-card-icon.gold {
+  background: linear-gradient(135deg, rgba(201,146,42,0.22), rgba(201,146,42,0.10)) !important;
+}
+html[data-theme="dark"] .tool-card-tag.ai {
+  background: rgba(14,95,168,0.22) !important;
+  color: #8ec7ff !important;
+}
+html[data-theme="dark"] .tool-card-tag.calc {
+  background: rgba(201,146,42,0.16) !important;
+  color: #f1cb7f !important;
+}
+html[data-theme="dark"] .tool-card-arrow {
+  background: rgba(255,255,255,0.06) !important;
+  color: var(--muted) !important;
+}
+html[data-theme="dark"] .tool-card:hover .tool-card-arrow {
+  background: var(--blue) !important;
+  color: #fff !important;
+}
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+  background: #0b1623 !important;
+  color: var(--ink) !important;
+  border-color: var(--border) !important;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #7f97b0 !important;
+}
+html[data-theme="dark"] button,
+html[data-theme="dark"] .btn,
+html[data-theme="dark"] .back-btn {
+  border-color: var(--border);
+}
+html[data-theme="dark"] .back-btn {
+  background: rgba(255,255,255,0.03) !important;
+  color: var(--ink) !important;
+}
+html[data-theme="dark"] table,
+html[data-theme="dark"] th,
+html[data-theme="dark"] td {
+  border-color: var(--border) !important;
+  color: var(--ink) !important;
+}
+html[data-theme="dark"] th {
+  background: rgba(58,157,232,0.12) !important;
+}
+html[data-theme="dark"] tr:nth-child(even) td {
+  background: rgba(255,255,255,0.02) !important;
+}
+html[data-theme="dark"] .sidebar {
+  box-shadow: inset -1px 0 0 rgba(255,255,255,0.05);
+}
+.theme-toggle {
+  width: calc(100% - 16px);
+  margin: 8px;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.92);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+.theme-toggle:hover {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.16);
+}
+.theme-toggle:active {
+  transform: scale(0.98);
+}
+.theme-toggle-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.09);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.theme-toggle-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.theme-toggle-label {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.theme-toggle-state {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.48);
+  margin-top: 2px;
+}
+.sidebar:not(:hover) .theme-toggle {
+  width: 42px;
+  height: 42px;
+  margin: 8px auto;
+  padding: 0;
+  justify-content: center;
+}
+.sidebar:not(:hover) .theme-toggle-copy {
+  display: none;
+}
+html[data-theme="dark"] #panel-pagare .panel-scroll,
+html[data-theme="dark"] #panel-aforo .panel-scroll,
+html[data-theme="dark"] #panel-calc .panel-scroll,
+html[data-theme="dark"] #panel-bitacora .panel-scroll {
+  background: var(--surface2) !important;
+}
+@media (max-width: 768px) {
+  .theme-toggle {
+    width: calc(100% - 16px) !important;
+    height: auto !important;
+    margin: 8px !important;
+    padding: 10px 12px !important;
+    justify-content: flex-start !important;
+  }
+  .theme-toggle-copy {
+    display: flex !important;
+  }
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style id="toolspk-unify-patch">
+/* ═══════════════════════════════════════════════════
+   TOOLSPK — PATCH UNIFICADO SIDEBAR
+═══════════════════════════════════════════════════ */
+.sidebar {
+  overflow: hidden !important;
+}
+
+.sidebar .sidebar-logo {
+  position: relative;
+  min-height: 76px;
+  padding: 18px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.sidebar .sidebar-logo::before {
+  content: "TPK";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.92);
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--blue), var(--blue3));
+  box-shadow: 0 10px 24px rgba(14,95,168,0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar .sidebar-logo img {
+  width: 184px !important;
+  max-width: calc(100% - 18px) !important;
+  height: auto !important;
+  display: block;
+  margin: 0 auto;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease, transform 0.2s ease, width 0.2s ease, max-width 0.2s ease;
+}
+
+.sidebar:not(:hover) .sidebar-logo {
+  justify-content: center !important;
+}
+
+.sidebar:not(:hover) .sidebar-logo::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.sidebar:not(:hover) .sidebar-logo img {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  max-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.sidebar .nav-item {
+  min-height: 50px;
+}
+
+.sidebar:not(:hover) .nav-item {
+  justify-content: center !important;
+  gap: 0 !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+.sidebar:not(:hover) .nav-item > span:not(.nav-icon),
+.sidebar:not(:hover) .nav-badge {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+}
+
+.sidebar:not(:hover) .nav-icon {
+  margin: 0 auto !important;
+}
+
+@media (max-width: 768px) {
+  .sidebar .sidebar-logo::before {
+    display: none !important;
+  }
+
+  .sidebar .sidebar-logo img {
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 184px !important;
+    max-width: calc(100% - 18px) !important;
+  }
+
+  .sidebar .nav-item {
+    gap: 11px !important;
+    justify-content: flex-start !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .sidebar .nav-item > span:not(.nav-icon),
+  .sidebar .nav-badge {
+    width: auto !important;
+    min-width: initial !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+  }
+}
+</style>
+
+
+<style id="toolspk-theme-floating-patch">
+/* ═══════════════════════════════════════════════════
+   TOOLSPK — PATCH FLOATING THEME + ICON ALIGNMENT
+═══════════════════════════════════════════════════ */
+.sidebar .nav-item {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.sidebar .nav-icon {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: 0 0 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  line-height: 1 !important;
+}
+
+.sidebar .nav-glyph {
+  width: 1.15em;
+  height: 1.15em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  text-align: center;
+  font-style: normal;
+}
+
+.sidebar:not(:hover) .nav-item {
+  justify-content: center !important;
+  gap: 0 !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+.sidebar:not(:hover) .nav-icon {
+  margin: 0 auto !important;
+}
+
+.theme-toggle,
+.sidebar:not(:hover) .theme-toggle {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: 20px !important;
+  left: auto !important;
+  width: auto !important;
+  min-width: 180px;
+  max-width: calc(100vw - 32px);
+  height: 50px !important;
+  margin: 0 !important;
+  padding: 10px 14px !important;
+  justify-content: flex-start !important;
+  border-radius: 14px !important;
+  z-index: 9999 !important;
+  box-shadow: 0 14px 34px rgba(10, 21, 32, 0.22), 0 4px 14px rgba(14,95,168,0.12) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.theme-toggle-copy,
+.sidebar:not(:hover) .theme-toggle-copy {
+  display: flex !important;
+}
+
+html[data-theme="light"] .theme-toggle {
+  background: rgba(255,255,255,0.92) !important;
+  color: var(--ink) !important;
+  border: 1px solid rgba(14,95,168,0.12) !important;
+}
+
+html[data-theme="light"] .theme-toggle-icon {
+  background: rgba(14,95,168,0.08) !important;
+}
+
+html[data-theme="light"] .theme-toggle-state {
+  color: var(--muted) !important;
+}
+
+html[data-theme="dark"] .theme-toggle {
+  background: rgba(15,26,39,0.92) !important;
+  color: rgba(255,255,255,0.94) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+}
+
+html[data-theme="dark"] .theme-toggle-icon {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+html[data-theme="dark"] .theme-toggle-state {
+  color: rgba(255,255,255,0.52) !important;
+}
+
+@media (max-width: 768px) {
+  .theme-toggle,
+  .sidebar:not(:hover) .theme-toggle {
+    right: 16px !important;
+    bottom: 16px !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div id="app">
@@ -299,26 +760,35 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
     <div class="sidebar-section">Herramientas</div>
 
     <div class="nav-item" id="nav-home" onclick="window.location.href='/index.html'">
-      <div class="nav-icon">🏠</div>
+      <div class="nav-icon"><span class="nav-glyph">🏠</span></div>
       <span>Inicio</span>
     </div>
     <div class="nav-item" id="nav-pagare" onclick="window.location.href='/pagare.html'">
-      <div class="nav-icon">📋</div>
+      <div class="nav-icon"><span class="nav-glyph">📋</span></div>
       <span>Revisión de Pagarés</span>
       <span class="nav-badge">IA</span>
     </div>
     <div class="nav-item" id="nav-aforo" class="nav-item active" onclick="window.location.href='/aforo.html'">
-      <div class="nav-icon">🏦</div>
+      <div class="nav-icon"><span class="nav-glyph">🏦</span></div>
       <span>Aforo de Garantía</span>
     </div>
     <div class="nav-item" id="nav-calc" onclick="window.location.href='/calc.html'">
-      <div class="nav-icon">🧮</div>
+      <div class="nav-icon"><span class="nav-glyph">🧮</span></div>
       <span>Calculadora de Crédito</span>
     </div>
     <div class="nav-item" id="nav-bitacora" onclick="window.location.href='/bitacora.html'">
-      <div class="nav-icon">📒</div>
+      <div class="nav-icon"><span class="nav-glyph">📒</span></div>
       <span>Bitácora de Gestiones</span>
     </div>
+
+    
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Cambiar entre modo claro y modo oscuro">
+      <span class="theme-toggle-icon" id="themeToggleIcon">☀️</span>
+      <span class="theme-toggle-copy">
+        <span class="theme-toggle-label">Apariencia</span>
+        <span class="theme-toggle-state" id="themeToggleState">Modo claro</span>
+      </span>
+    </button>
 
     <div class="sidebar-spacer"></div>
     <div class="sidebar-footer">ToolsPK v1.0 · Proaktiva</div>
@@ -748,7 +1218,7 @@ function AforoApp() {
     <div className="aforo-app">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
-        .aforo-app { font-family: 'DM Sans', sans-serif; background: #f5f2ed; min-height: 100%; }
+        .aforo-app { font-family: 'DM Sans', sans-serif; background: var(--surface2); min-height: 100%; }
         .aforo-main { display: grid; grid-template-columns: 1fr 340px; gap: 0; max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
         @media (max-width: 860px) { 
           .aforo-main { grid-template-columns: 1fr; padding: 20px 16px; }
@@ -764,63 +1234,63 @@ function AforoApp() {
           .aforo-pdf-btn { width: 100%; justify-content: center; }
         }
         .aforo-form { padding-right: 28px; display: flex; flex-direction: column; gap: 20px; }
-        .asection { background: white; border: 1px solid #e0dbd2; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-        .asection-header { background: #faf8f5; border-bottom: 1px solid #e0dbd2; padding: 12px 18px; display: flex; align-items: center; gap: 10px; }
-        .asection-num { width: 26px; height: 26px; background: #1a3a2a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
-        .asection-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: #1a3a2a; }
+        .asection { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 6px 24px rgba(14,95,168,0.08); }
+        .asection-header { background: #f8fbff; border-bottom: 1px solid var(--border); padding: 12px 18px; display: flex; align-items: center; gap: 10px; }
+        .asection-num { width: 26px; height: 26px; background: linear-gradient(135deg, var(--blue), var(--blue3)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; box-shadow: 0 4px 10px rgba(14,95,168,0.18); }
+        .asection-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--ink); }
         .asection-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
         .afield { display: flex; flex-direction: column; gap: 5px; }
-        .afield-label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: #5a5752; }
-        .afield-hint { font-size: 12px; color: #9a968f; font-style: italic; }
-        .aforo-app input[type="text"] { width: 100%; padding: 10px 13px; border: 1.5px solid #e0dbd2; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #1a1a18; background: white; outline: none; transition: border-color 0.2s; }
-        .aforo-app input:focus { border-color: #2d6a4f; }
+        .afield-label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); }
+        .afield-hint { font-size: 12px; color: #89a0b6; font-style: italic; }
+        .aforo-app input[type="text"] { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: white; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        .aforo-app input:focus { border-color: var(--blue2); box-shadow: 0 0 0 3px rgba(26,125,212,0.12); }
         .arow-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .aradio-group { display: flex; flex-direction: column; gap: 7px; }
-        .aradio-option { display: flex; align-items: flex-start; gap: 9px; padding: 9px 13px; border: 1.5px solid #e0dbd2; border-radius: 8px; cursor: pointer; transition: all 0.15s; font-size: 13px; line-height: 1.4; }
-        .aradio-option:hover { border-color: #2d6a4f; background: #f0f7f3; }
-        .aradio-option.selected { border-color: #2d6a4f; background: #e8f4ee; color: #1a3a2a; font-weight: 500; }
-        .aradio-option.tentativo { border-color: #e0a020; background: #fffbf0; }
-        .aradio-option input[type="radio"] { margin-top: 2px; accent-color: #2d6a4f; flex-shrink: 0; }
-        .abadge-tentativo { margin-left: auto; font-size: 10px; font-weight: 600; color: #b5860d; white-space: nowrap; }
+        .aradio-option { display: flex; align-items: flex-start; gap: 9px; padding: 9px 13px; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.15s; font-size: 13px; line-height: 1.4; }
+        .aradio-option:hover { border-color: var(--blue2); background: #f3f9ff; }
+        .aradio-option.selected { border-color: var(--blue2); background: #eaf4ff; color: var(--ink); font-weight: 500; }
+        .aradio-option.tentativo { border-color: #d9a23a; background: #fff8ea; }
+        .aradio-option input[type="radio"] { margin-top: 2px; accent-color: var(--blue2); flex-shrink: 0; }
+        .abadge-tentativo { margin-left: auto; font-size: 10px; font-weight: 600; color: var(--gold); white-space: nowrap; }
         .atoggle { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; padding: 6px 0; user-select: none; }
-        .atoggle-track { width: 40px; height: 22px; background: #e0dbd2; border-radius: 11px; position: relative; transition: background 0.2s; flex-shrink: 0; }
-        .atoggle-track.on { background: #2d6a4f; }
+        .atoggle-track { width: 40px; height: 22px; background: #d7e3ef; border-radius: 11px; position: relative; transition: background 0.2s; flex-shrink: 0; }
+        .atoggle-track.on { background: var(--blue2); }
         .atoggle-thumb { width: 16px; height: 16px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .atoggle-track.on .atoggle-thumb { transform: translateX(18px); }
         .atoggles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .agrupo-tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
-        .agrupo-tab { padding: 7px 14px; border: 1.5px solid #e0dbd2; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.15s; background: white; font-family: 'DM Sans', sans-serif; }
-        .agrupo-tab.active { border-color: #2d6a4f; background: #e8f4ee; color: #1a3a2a; font-weight: 600; }
+        .agrupo-tab { padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.15s; background: white; font-family: 'DM Sans', sans-serif; }
+        .agrupo-tab.active { border-color: var(--blue2); background: #eaf4ff; color: var(--ink); font-weight: 600; }
         /* Sidebar */
         .aforo-sidebar { position: sticky; top: 24px; }
-        .aforo-result-panel { background: #1a3a2a; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.15); color: white; }
+        .aforo-result-panel { background: linear-gradient(160deg, var(--dark) 0%, var(--dark2) 58%, #124a82 100%); border-radius: 12px; overflow: hidden; box-shadow: 0 14px 34px rgba(14,95,168,0.18); color: white; }
         .aforo-result-header { padding: 16px 20px 12px; border-bottom: 1px solid rgba(255,255,255,0.12); }
-        .aforo-result-header h3 { font-family: 'DM Serif Display', serif; font-size: 18px; color: #a8c5b5; }
+        .aforo-result-header h3 { font-family: 'DM Serif Display', serif; font-size: 18px; color: #bfe2ff; }
         .aforo-kpis { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.12); }
         .akpi { display: flex; justify-content: space-between; align-items: center; }
-        .akpi-label { font-size: 11px; letter-spacing: 0.5px; color: #7aaa90; }
+        .akpi-label { font-size: 11px; letter-spacing: 0.5px; color: rgba(191,226,255,0.74); }
         .akpi-value { font-size: 15px; font-weight: 600; color: white; }
-        .akpi-value.big { font-size: 26px; color: #7dffb3; }
+        .akpi-value.big { font-size: 26px; color: #7fc9ff; }
         .aforo-indicator { padding: 12px 20px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.12); }
         .aforo-bar-bg { height: 7px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; margin: 6px 0 4px; }
-        .aforo-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s; background: linear-gradient(90deg, #3a9a6a, #7dffb3); }
+        .aforo-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s; background: linear-gradient(90deg, var(--blue2), var(--blue3)); }
         .aforo-range { font-size: 10px; color: rgba(255,255,255,0.35); display: flex; justify-content: space-between; }
         .aforo-desglose { padding: 12px 20px; display: flex; flex-direction: column; gap: 5px; max-height: 280px; overflow-y: auto; border-bottom: 1px solid rgba(255,255,255,0.12); }
-        .adesglose-title { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #7aaa90; margin-bottom: 4px; }
+        .adesglose-title { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(191,226,255,0.74); margin-bottom: 4px; }
         .adesglose-row { font-size: 11px; color: rgba(255,255,255,0.7); padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,0.05); line-height: 1.4; }
-        .adesglose-concepto { font-size: 9px; text-transform: uppercase; color: #7aaa90; margin-bottom: 1px; }
+        .adesglose-concepto { font-size: 9px; text-transform: uppercase; color: rgba(191,226,255,0.74); margin-bottom: 1px; }
         /* Valor garantia input section */
         .aforo-valor-section { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.12); }
-        .aforo-valor-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #7aaa90; margin-bottom: 6px; }
+        .aforo-valor-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(191,226,255,0.74); margin-bottom: 6px; }
         .aforo-valor-input { width: 100%; padding: 8px 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
-        .aforo-valor-input:focus { border-color: #7dffb3; }
+        .aforo-valor-input:focus { border-color: #7fc9ff; }
         .aforo-valor-input::placeholder { color: rgba(255,255,255,0.3); }
         .aforo-prestable { margin-top: 10px; }
-        .aforo-prestable-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #7aaa90; }
-        .aforo-prestable-value { font-size: 18px; font-weight: 700; color: #7dffb3; margin-top: 2px; }
+        .aforo-prestable-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: rgba(191,226,255,0.74); }
+        .aforo-prestable-value { font-size: 18px; font-weight: 700; color: #7fc9ff; margin-top: 2px; }
         /* PDF button */
-        .aforo-pdf-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 40px); margin: 14px 20px; padding: 11px; background: #b5860d; color: white; border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .aforo-pdf-btn:hover:not(:disabled) { background: #9a6e08; transform: translateY(-1px); }
+        .aforo-pdf-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 40px); margin: 14px 20px; padding: 11px; background: linear-gradient(135deg, var(--blue), var(--blue2)); color: white; border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 8px 20px rgba(14,95,168,0.22); }
+        .aforo-pdf-btn:hover:not(:disabled) { background: linear-gradient(135deg, var(--blue2), var(--blue3)); transform: translateY(-1px); }
         .aforo-pdf-btn:disabled { opacity: 0.4; cursor: not-allowed; }
         .aforo-empty { padding: 28px 20px; text-align: center; color: rgba(255,255,255,0.3); font-size: 13px; line-height: 1.6; }
         .aforo-footer-note { padding: 12px 20px; background: rgba(0,0,0,0.2); font-size: 10px; color: rgba(255,255,255,0.35); line-height: 1.5; }
@@ -1025,6 +1495,39 @@ document.querySelectorAll('.nav-item').forEach(function(item) {
     if (window.innerWidth <= 768) closeSidebar();
   });
 });
+</script>
+
+<script>
+(function () {
+  var storageKey = 'toolspk-theme';
+
+  function currentTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  }
+
+  function updateThemeButton() {
+    var icon = document.getElementById('themeToggleIcon');
+    var state = document.getElementById('themeToggleState');
+    var btn = document.getElementById('themeToggle');
+    var dark = currentTheme() === 'dark';
+    if (icon) icon.textContent = dark ? '🌙' : '☀️';
+    if (state) state.textContent = dark ? 'Modo oscuro' : 'Modo claro';
+    if (btn) btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+  }
+
+  window.toggleToolsPKTheme = function () {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem(storageKey, next); } catch (e) {}
+    updateThemeButton();
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var btn = document.getElementById('themeToggle');
+    if (btn) btn.addEventListener('click', window.toggleToolsPKTheme);
+    updateThemeButton();
+  });
+})();
 </script>
 </body>
 </html>
