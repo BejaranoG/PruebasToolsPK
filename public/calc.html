@@ -1175,6 +1175,14 @@ function kpiCard(label, value, color, sub) {
 }
 function pctOf(a, b) { return b ? (a/b*100).toFixed(1) : '0.0'; }
 function periodLabel(p) { return {mensual:'Mensual',bimestral:'Bimestral',trimestral:'Trimestral',semestral:'Semestral',anual:'Anual'}[p] || p; }
+function unidadLabel(u, qty) {
+  if (u === 'anios') return (Number(qty) === 1 ? 'año' : 'años');
+  if (u === 'meses') return (Number(qty) === 1 ? 'mes' : 'meses');
+  return u;
+}
+function capitalPeriodLabel(p) {
+  return {igual:'Igual a interés',bullet:'Bullet',mensual:'Mensual',bimestral:'Bimestral',trimestral:'Trimestral',semestral:'Semestral',anual:'Anual'}[p] || p;
+}
 function tipoLabel(t) { return {frances:'Capital Creciente',aleman:'Capital Fijo',bullet:'Bullet / Diferido'}[t] || t; }
 
 // ── EXPORT PDF ─────────────────────────────────────────────────────────────
@@ -1206,8 +1214,10 @@ function exportPDF() {
   // Params summary
   var monto = parseMoney(document.getElementById('inp-monto').value);
   var tiie = parseFloat(document.getElementById('inp-tiie').value)||0;
-  var spread = parseFloat(document.getElementById('inp-spread').value)||0;
-  var plazo = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
+  var spread = getSpread();
+  var plazoQty = document.getElementById('inp-plazo').value;
+  var plazoUnidad = document.getElementById('inp-unidad').value;
+  var plazo = plazoQty + ' ' + unidadLabel(plazoUnidad, plazoQty);
   var periodo = document.getElementById('inp-periodo-interes').value;
   var periodoCap = document.getElementById('inp-periodo-capital').value;
   var graceMeses = parseInt(document.getElementById('inp-grace').value, 10) || 0;
@@ -1226,7 +1236,7 @@ function exportPDF() {
   doc.text(plazo, mL+cols*2+2, y+13);
   doc.setFont('helvetica','bold');
   doc.text('Periodicidad:', mL+cols*3+2, y+6); doc.setFont('helvetica','normal');
-  doc.text(periodLabel(periodo) + (periodoCap !== 'igual' ? ' | Cap: ' + periodoCap : ''), mL+cols*3+2, y+13);
+  doc.text(periodLabel(periodo) + (periodoCap !== 'igual' ? ' | Cap: ' + capitalPeriodLabel(periodoCap) : ''), mL+cols*3+2, y+13);
   if (graceMeses > 0) {
     doc.setFont('helvetica','italic'); doc.setFontSize(7); doc.setTextColor(140,90,0);
     doc.text('Período de gracia de capital: ' + graceMeses + ' meses', mL+2, y+20);
@@ -1306,7 +1316,9 @@ function exportExcel() {
   var monto  = parseMoney(document.getElementById('inp-monto').value);
   var tiie   = parseFloat(document.getElementById('inp-tiie').value)||0;
   var spread = getSpread();
-  var plazo  = document.getElementById('inp-plazo').value + ' ' + document.getElementById('inp-unidad').value;
+  var plazoQty = document.getElementById('inp-plazo').value;
+  var plazoUnidad = document.getElementById('inp-unidad').value;
+  var plazo  = plazoQty + ' ' + unidadLabel(plazoUnidad, plazoQty);
   var periodo= document.getElementById('inp-periodo-interes').value;
   var periodoCap = document.getElementById('inp-periodo-capital').value;
   var graceMeses = document.getElementById('inp-grace').value || '0';
@@ -1325,7 +1337,7 @@ function exportExcel() {
     ['Plazo', plazo],
     ['Periodicidad', periodLabel(periodo)],
     ['Tipo amortización', tipoLabel(tipoAmort)],
-    ['Periodicidad capital', periodoCap],
+    ['Periodicidad capital', capitalPeriodLabel(periodoCap)],
     ['Período de gracia', (parseInt(graceMeses)||0) + ' meses'],
     ['Fecha generación', new Date().toLocaleDateString('es-MX')],
   ];
