@@ -44,75 +44,44 @@ app.get('/api/status', (req, res) => {
 });
 
 
-// ── TIIE scraper from DOF ──────────────────────────────────────────────────
+// ── TIIE 28d desde RSS público de Banxico (sin token requerido) ───────────
+// Feed: https://www.banxico.org.mx/rsscb/rss?BMXC_canal=tiie&BMXC_idioma=es
 app.get('/api/tiie', async (req, res) => {
   try {
-    const response = await fetch('https://www.dof.gob.mx/indicadores.php', {
+    const rssUrl = 'https://www.banxico.org.mx/rsscb/rss?BMXC_canal=tiie&BMXC_idioma=es';
+    const response = await fetch(rssUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'es-MX,es;q=0.9',
-      },
-      timeout: 10000
+        'User-Agent': 'Mozilla/5.0',
+        'Accept': 'application/xml, text/xml, */*'
+      }
     });
-    const html = await response.text();
 
-    // Parse TIIE 28 días from the DOF indicators page
-    // The page has a table with indicators; TIIE 28d appears with its rate
-    let tiie = null;
+    if (!response.ok) {
+      throw new Error('Banxico RSS respondió ' + response.status);
+    }
+
+    const xml = await response.text();
+
+    // Parse TIIE value from <cb:value ...>7.1981</cb:value>
+    const valMatch = xml.match(/<cb:value[^>]*>([\d.]+)<\/cb:value>/);
+    if (!valMatch) throw new Error('No se encontró valor TIIE en el RSS');
+
+    const tiie = parseFloat(valMatch[1]);
+    if (isNaN(tiie) || tiie < 1 || tiie > 50) throw new Error('Valor TIIE inválido: ' + valMatch[1]);
+
+    // Parse date from <dc:date>2026-03-06T12:30:03-06:00</dc:date>
     let fecha = null;
-
-    // Try multiple patterns the DOF page uses
-    // Pattern 1: TIIE followed by number in table
-    const patterns = [
-      /TIIE[\s\S]{0,200}?28[\s\S]{0,100}?([\d]+[.,][\d]{2,6})/i,
-      /TIIE a 28[\s\S]{0,100}?([\d]+[.,][\d]{2,6})/i,
-      /28 d[íi]as?[\s\S]{0,200}?(\d{1,2}[.,]\d{2,6})/i,
-    ];
-
-    for (const pat of patterns) {
-      const m = html.match(pat);
-      if (m) {
-        tiie = parseFloat(m[1].replace(',', '.'));
-        if (tiie > 1 && tiie < 50) break;
-        tiie = null;
-      }
+    const dateMatch = xml.match(/<dc:date>([\d]{4}-[\d]{2}-[\d]{2})/);
+    if (dateMatch) {
+      const [y, m, d] = dateMatch[1].split('-');
+      fecha = d + '/' + m + '/' + y;
     }
 
-    // Try to extract date
-    const dateMatch = html.match(/TIIE[\s\S]{0,300}?(\d{1,2}\/\d{1,2}\/\d{4})/i)
-                  || html.match(/(\d{1,2} de [a-záéíóúñ]+ de \d{4})/i);
-    if (dateMatch) fecha = dateMatch[1];
-
-    if (tiie) {
-      return res.json({ tiie: tiie.toFixed(4), fecha });
-    }
-
-    // Fallback: try to find any percentage near "TIIE" token in text
-    const tiieIdx = html.search(/TIIE/i);
-    if (tiieIdx !== -1) {
-      const snippet = html.slice(tiieIdx, tiieIdx + 2000);
-      const numMatch = snippet.match(/(\d{1,2}[.,]\d{3,6})/g);
-      if (numMatch) {
-        for (const n of numMatch) {
-          const v = parseFloat(n.replace(',', '.'));
-          if (v > 5 && v < 40) {
-            tiie = v;
-            break;
-          }
-        }
-      }
-    }
-
-    if (tiie) {
-      return res.json({ tiie: tiie.toFixed(4), fecha });
-    }
-
-    res.status(404).json({ error: 'No se encontró la TIIE en la página del DOF' });
+    return res.json({ tiie: tiie.toFixed(4), fecha, fuente: 'Banxico RSS' });
 
   } catch (err) {
     console.error('TIIE fetch error:', err.message);
-    res.status(500).json({ error: 'Error al consultar el DOF: ' + err.message });
+    res.status(500).json({ error: 'Error al consultar Banxico: ' + err.message });
   }
 });
 
