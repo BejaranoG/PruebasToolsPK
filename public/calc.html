@@ -49,17 +49,16 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
   width: 58px; min-width: 58px;
   background: var(--dark);
   display: flex; flex-direction: column;
-  height: 100vh; overflow-y: auto;
+  height: 100vh;
   transition: width 0.28s cubic-bezier(0.4,0,0.2,1);
   overflow: hidden;
   position: relative;
   z-index: 10;
   flex-shrink: 0;
 }
-.sidebar:hover {
-  width: 240px;
-}
-/* Hide text labels when collapsed */
+.sidebar:hover { width: 240px; }
+
+/* ── Label visibility ── */
 .sidebar .sidebar-logo-name,
 .sidebar .sidebar-logo-sub,
 .sidebar .sidebar-section,
@@ -70,25 +69,48 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
   transition: opacity 0.18s ease;
   white-space: nowrap;
   overflow: hidden;
+  flex-shrink: 0;
 }
 .sidebar:hover .sidebar-logo-name,
 .sidebar:hover .sidebar-logo-sub,
 .sidebar:hover .sidebar-section,
 .sidebar:hover .sidebar-footer,
 .sidebar:hover .nav-badge,
-.sidebar:hover .nav-item > span:not(.nav-icon) {
-  opacity: 1;
-}
-/* Logo area: center icon when collapsed */
-.sidebar .sidebar-logo {
-  transition: padding 0.28s;
-  justify-content: flex-start;
-}
-/* nav-item: center icon when collapsed, left-align when expanded */
+.sidebar:hover .nav-item > span:not(.nav-icon) { opacity: 1; }
+
+/* ── nav-item: fixed layout, icon never moves ── */
 .sidebar .nav-item {
-  justify-content: flex-start;
-  padding-left: 14px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 0;
+  margin: 2px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.55);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  padding-left: calc((58px - 30px) / 2);
+  padding-right: 0;
+  width: 100%;
 }
+.sidebar .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+.sidebar .nav-item.active { background: rgba(14,95,168,0.25); border-color: rgba(14,95,168,0.4); color: white; }
+
+/* ── nav-icon: fixed 30px, never repositions ── */
+.sidebar .nav-icon {
+  width: 30px; height: 30px;
+  min-width: 30px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  background: rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.sidebar .nav-item.active .nav-icon { background: rgba(14,95,168,0.4); }
 .sidebar-logo {
   padding: 20px 12px 16px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -242,10 +264,29 @@ html, body { height: 100%; font-family: "IBM Plex Sans", sans-serif; color: var(
     transition: left 0.25s ease !important;
     overflow-y: auto;
   }
+  /* On mobile: disable hover width change, only slide matters */
   .sidebar:hover { width: 240px !important; }
-  .sidebar.open { left: 0; }
-  .sidebar .sidebar-logo-name, .sidebar .sidebar-logo-sub, .sidebar .sidebar-section,
-  .sidebar .sidebar-footer, .sidebar .nav-badge, .sidebar .nav-item > span:not(.nav-icon) { opacity: 1; }
+  .sidebar.open { left: 0 !important; }
+
+  /* When open on mobile: show all labels */
+  .sidebar.open .sidebar-logo-name,
+  .sidebar.open .sidebar-logo-sub,
+  .sidebar.open .sidebar-section,
+  .sidebar.open .sidebar-footer,
+  .sidebar.open .nav-badge,
+  .sidebar.open .nav-item > span:not(.nav-icon) { opacity: 1 !important; }
+
+  /* When open: fix nav-item layout to left-aligned with proper padding */
+  .sidebar.open .nav-item {
+    padding-left: 14px !important;
+    justify-content: flex-start !important;
+    width: calc(240px - 16px) !important;
+    margin: 2px 8px !important;
+  }
+  /* When closed on mobile: keep icons centered */
+  .sidebar:not(.open) .nav-item {
+    padding-left: calc((58px - 30px) / 2) !important;
+  }
 
   .main { margin-left: 0 !important; }
 
@@ -1020,13 +1061,6 @@ html[data-theme="dark"] .cmp-kpi-card {
   font-style: normal;
 }
 
-.sidebar:not(:hover) .nav-item {
-  justify-content: center !important;
-  gap: 0 !important;
-  padding-left: 8px !important;
-  padding-right: 8px !important;
-}
-
 .sidebar:not(:hover) .nav-icon {
   margin: 0 auto !important;
 }
@@ -1136,6 +1170,7 @@ html[data-theme="dark"] .theme-toggle-state {
       <div class="nav-icon"><span class="nav-glyph">📒</span></div>
       <span>Bitácora de Gestiones</span>
     </div>
+
 
     
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Cambiar entre modo claro y modo oscuro">
