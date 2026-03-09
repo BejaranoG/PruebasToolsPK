@@ -576,6 +576,171 @@ html[data-theme="dark"] #panel-bitacora .panel-scroll {
   }
 }
 
+/* ══════════════════════════════════════════════════════
+   DARK MODE — RESULTADOS / FINDINGS (pagare)
+══════════════════════════════════════════════════════ */
+
+/* Color vars override para dark */
+html[data-theme="dark"] {
+  --red:        #ff7e75;
+  --green:      #5ecb9a;
+  --yellow:     #f0c060;
+  --orange:     #ffa05a;
+  --red-bg:     rgba(220,60,50,0.14);
+  --green-bg:   rgba(50,180,110,0.13);
+  --yellow-bg:  rgba(220,170,30,0.13);
+  --blue-bg:    rgba(40,130,220,0.13);
+  --orange-bg:  rgba(220,120,30,0.13);
+  --bg2:        #0f1e2e;
+  --ink2:       #b8d0e8;
+  --border2:    #2a4560;
+}
+
+/* Finding rows */
+html[data-theme="dark"] .finding.f-error {
+  background: rgba(220,60,50,0.14) !important;
+  border-color: rgba(220,60,50,0.35) !important;
+}
+html[data-theme="dark"] .finding.f-warning {
+  background: rgba(220,170,30,0.13) !important;
+  border-color: rgba(220,170,30,0.35) !important;
+}
+html[data-theme="dark"] .finding.f-info {
+  background: rgba(220,120,30,0.13) !important;
+  border-color: rgba(220,120,30,0.32) !important;
+}
+html[data-theme="dark"] .finding.f-comment {
+  background: rgba(40,130,220,0.13) !important;
+  border-color: rgba(40,130,220,0.30) !important;
+}
+html[data-theme="dark"] .finding.f-ok {
+  background: rgba(50,180,110,0.13) !important;
+  border-color: rgba(50,180,110,0.32) !important;
+}
+
+/* Badges */
+html[data-theme="dark"] .finding.f-error .fbadge {
+  background: rgba(255,100,90,0.20) !important;
+  color: #ff8c85 !important;
+}
+html[data-theme="dark"] .finding.f-warning .fbadge {
+  background: rgba(240,192,90,0.20) !important;
+  color: #f5ce60 !important;
+}
+html[data-theme="dark"] .finding.f-info .fbadge {
+  background: rgba(255,165,90,0.20) !important;
+  color: #ffb070 !important;
+}
+html[data-theme="dark"] .finding.f-comment .fbadge {
+  background: rgba(60,160,255,0.20) !important;
+  color: #70c0ff !important;
+}
+html[data-theme="dark"] .finding.f-ok .fbadge {
+  background: rgba(80,210,140,0.20) !important;
+  color: #60d8a0 !important;
+}
+
+/* Título y detalle del finding */
+html[data-theme="dark"] .ftitle {
+  color: #deeeff !important;
+  font-weight: 600 !important;
+}
+html[data-theme="dark"] .fdetail {
+  color: #9dbcd8 !important;
+  line-height: 1.7 !important;
+}
+
+/* Cita / quote */
+html[data-theme="dark"] .fquote {
+  background: rgba(0,0,0,0.3) !important;
+  border-left-color: #2a4f70 !important;
+  color: #7fb8d8 !important;
+  font-family: "IBM Plex Mono", monospace !important;
+}
+
+/* Veredicto */
+html[data-theme="dark"] .verdict-row {
+  background: #0a1928 !important;
+  border: 1px solid #1e3550 !important;
+}
+html[data-theme="dark"] .verdict-grade {
+  text-shadow: 0 0 20px currentColor;
+}
+html[data-theme="dark"] .verdict-text h4 {
+  color: #deeeff !important;
+}
+html[data-theme="dark"] .verdict-text p {
+  color: #8ab0cc !important;
+}
+
+/* Párrafo resumen */
+html[data-theme="dark"] .summary-p {
+  background: #0a1928 !important;
+  color: #a8c8e0 !important;
+  border: 1px solid #1e3550 !important;
+  line-height: 1.85 !important;
+}
+
+/* Secciones de resultado */
+html[data-theme="dark"] .section-title,
+html[data-theme="dark"] .findings-title {
+  color: #c8e0f8 !important;
+}
+
+/* Metric cards en resultado */
+html[data-theme="dark"] .metric-card {
+  background: #0d1e30 !important;
+  border-color: #1e3550 !important;
+}
+html[data-theme="dark"] .metric-label {
+  color: #6a90b0 !important;
+}
+html[data-theme="dark"] .metric-value {
+  color: #deeeff !important;
+}
+html[data-theme="dark"] .metric-value.ok  { color: #5ecb9a !important; }
+html[data-theme="dark"] .metric-value.err { color: #ff8c85 !important; }
+html[data-theme="dark"] .metric-value.warn{ color: #f5ce60 !important; }
+
+/* Tabla comparativa (cotejo) */
+html[data-theme="dark"] .table-wrap table thead th {
+  background: #061020 !important;
+  color: #90c0e0 !important;
+  border-bottom: 2px solid #1e3550 !important;
+}
+html[data-theme="dark"] .table-wrap table td {
+  color: #c8dff0 !important;
+  border-bottom-color: #152840 !important;
+}
+html[data-theme="dark"] .table-wrap table tr:nth-child(even) td {
+  background: rgba(255,255,255,0.025) !important;
+}
+html[data-theme="dark"] .cell-ok   { color: #5ecb9a !important; font-weight: 600 !important; }
+html[data-theme="dark"] .cell-err  { color: #ff8c85 !important; font-weight: 600 !important; }
+html[data-theme="dark"] .cell-warn { color: #f5ce60 !important; font-weight: 600 !important; }
+html[data-theme="dark"] .cell-mismatch { color: #ff8c85 !important; }
+html[data-theme="dark"] .cell-match    { color: #5ecb9a !important; }
+
+/* Botón reset */
+html[data-theme="dark"] .btn-reset {
+  border-color: #2a4560 !important;
+  color: #7aa0c0 !important;
+}
+html[data-theme="dark"] .btn-reset:hover {
+  border-color: #5a90c0 !important;
+  color: #a0c8e8 !important;
+}
+
+/* Tags / chips de resultado */
+html[data-theme="dark"] .tag-ok    { background: rgba(80,210,140,0.18) !important; color: #60d8a0 !important; border-color: rgba(80,210,140,0.3) !important; }
+html[data-theme="dark"] .tag-error { background: rgba(220,60,50,0.18)  !important; color: #ff8c85 !important; border-color: rgba(220,60,50,0.3)  !important; }
+html[data-theme="dark"] .tag-warn  { background: rgba(220,170,30,0.18) !important; color: #f5ce60 !important; border-color: rgba(220,170,30,0.3) !important; }
+
+/* Panel scroll background */
+html[data-theme="dark"] #panel-pagare .panel-scroll {
+  background: #060f18 !important;
+}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
