@@ -807,6 +807,182 @@ html[data-theme="dark"] #panel-bitacora .panel-scroll {
   .mode-toggle { max-width: 100%; }
 }
 
+/* ── CALC DARK MODE OVERRIDES ── */
+html[data-theme="dark"] #panel-calc .panel-scroll,
+html[data-theme="dark"] #panel-cmp .panel-scroll {
+  background: #0a1520 !important;
+}
+
+/* CSS variables remapped for dark */
+html[data-theme="dark"] #panel-calc,
+html[data-theme="dark"] #panel-cmp {
+  --calc-bg: #0a1520;
+  --calc-surface: #0f1e2e;
+  --calc-border: #1e3550;
+  --calc-ink: #d8ecff;
+  --calc-muted: #7aa5c8;
+  --calc-navy: #061020;
+}
+
+/* Form / field groups */
+html[data-theme="dark"] .calc-form,
+html[data-theme="dark"] .field-group,
+html[data-theme="dark"] .calc-section {
+  background: var(--calc-surface) !important;
+  border-color: var(--calc-border) !important;
+  color: var(--calc-ink) !important;
+}
+html[data-theme="dark"] .field-label {
+  color: #9fc8e8 !important;
+}
+html[data-theme="dark"] .tiie-hint {
+  color: #6a92b0 !important;
+}
+
+/* KPI cards */
+html[data-theme="dark"] .kpi-grid .kpi-card {
+  background: #0f1e2e !important;
+  border-color: #1e3550 !important;
+}
+html[data-theme="dark"] .kpi-card-label {
+  color: #7aa5c8 !important;
+}
+html[data-theme="dark"] .kpi-card-sub {
+  color: #5a88a8 !important;
+}
+
+/* Chart card */
+html[data-theme="dark"] .chart-card {
+  background: #0f1e2e !important;
+  border-color: #1e3550 !important;
+}
+html[data-theme="dark"] .chart-title,
+html[data-theme="dark"] .chart-legend {
+  color: #9fc8e8 !important;
+}
+html[data-theme="dark"] .legend-item {
+  color: #b0cce6 !important;
+}
+
+/* Table card container */
+html[data-theme="dark"] .table-card {
+  background: #0f1e2e !important;
+  border-color: #1e3550 !important;
+}
+html[data-theme="dark"] .table-card-header {
+  background: #0a1520 !important;
+  border-bottom-color: #1e3550 !important;
+}
+html[data-theme="dark"] .table-card-title {
+  color: #c8e0f8 !important;
+}
+
+/* Amortization table rows */
+html[data-theme="dark"] .amort-table thead {
+  background: #061020 !important;
+}
+html[data-theme="dark"] .amort-table th {
+  color: #9fc8e8 !important;
+  border-bottom: 2px solid #1e3550 !important;
+}
+html[data-theme="dark"] .amort-table td {
+  color: #d0e8ff !important;
+  border-bottom-color: #152840 !important;
+  background: transparent !important;
+}
+html[data-theme="dark"] .amort-table tr:nth-child(even) td {
+  background: rgba(255,255,255,0.03) !important;
+}
+html[data-theme="dark"] .amort-table tr:hover td {
+  background: rgba(58,157,232,0.10) !important;
+}
+html[data-theme="dark"] .amort-table td:first-child {
+  color: #7aa5c8 !important;
+}
+html[data-theme="dark"] .amort-table td.fecha {
+  color: #c8e0f8 !important;
+}
+html[data-theme="dark"] .amort-table td.capital {
+  color: #6fd4a8 !important;
+}
+html[data-theme="dark"] .amort-table td.interes {
+  color: #f0c96a !important;
+}
+html[data-theme="dark"] .amort-table td.pago {
+  color: #80bdff !important;
+  font-weight: 600;
+}
+/* Totals row */
+html[data-theme="dark"] .amort-table tr:last-child td {
+  background: #0a1520 !important;
+  border-top: 2px solid #2a4870 !important;
+  color: #d0e8ff !important;
+  font-weight: 700;
+}
+html[data-theme="dark"] .amort-table tr:last-child td.capital {
+  color: #5ecb9a !important;
+}
+html[data-theme="dark"] .amort-table tr:last-child td.interes {
+  color: #e8b84a !important;
+}
+html[data-theme="dark"] .amort-table tr:last-child td.pago {
+  color: #70b0ff !important;
+}
+
+/* Tasa total display box */
+html[data-theme="dark"] #tasa-total-display {
+  background: #0a1a30 !important;
+  border: 1px solid #1e3a5a !important;
+}
+html[data-theme="dark"] #tasa-total-val {
+  color: #60b0ff !important;
+}
+html[data-theme="dark"] #tasa-total-breakdown {
+  color: #7aa5c8 !important;
+}
+
+/* Amort type tabs */
+html[data-theme="dark"] .amort-tab {
+  background: #0f1e2e !important;
+  border-color: #1e3550 !important;
+  color: #7aa5c8 !important;
+}
+html[data-theme="dark"] .amort-tab.active {
+  background: rgba(14,95,168,0.35) !important;
+  border-color: #2882d0 !important;
+  color: #80c8ff !important;
+}
+
+/* Tipo credito tabs */
+html[data-theme="dark"] .tipo-tab {
+  background: #0f1e2e !important;
+  border-color: #1e3550 !important;
+  color: #7aa5c8 !important;
+}
+html[data-theme="dark"] .tipo-tab.active {
+  background: rgba(14,95,168,0.35) !important;
+  border-color: #2882d0 !important;
+  color: #80c8ff !important;
+}
+
+/* Compare scenario panels */
+html[data-theme="dark"] .cmp-scenario {
+  background: #0f1e2e !important;
+  border-color: #1e3550 !important;
+}
+html[data-theme="dark"] .cmp-scenario-title {
+  color: #c8e0f8 !important;
+}
+html[data-theme="dark"] .cmp-banner {
+  background: #061020 !important;
+  border-color: #1e3550 !important;
+}
+html[data-theme="dark"] .cmp-kpi-card {
+  background: #0f1e2e !important;
+  border-color: #1e3550 !important;
+}
+
+
 </style>
 
 <style id="toolspk-theme-floating-patch">
