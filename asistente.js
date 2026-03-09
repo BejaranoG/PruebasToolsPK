@@ -51,11 +51,18 @@ Las siguientes áreas están completamente fuera de tu alcance. Ante cualquier p
   var style = document.createElement('style');
   style.textContent = `
 #pkAsistente {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 9999;
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 2147483647 !important;
   font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  contain: none !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  display: block !important;
+  visibility: visible !important;
+  clip: auto !important;
+  overflow: visible !important;
 }
 
 /* ── TOGGLE BUTTON ── */
@@ -362,7 +369,7 @@ html[data-theme="dark"] #pkAInput:focus { border-color: #2882d0 !important; }
       <div id="pkADot"></div>
     </button>
   `;
-  document.body.appendChild(wrap);
+  document.documentElement.appendChild(wrap);
 
   // ── STATE ─────────────────────────────────────────────────────────────────
   var history  = [];   // [{role, content}]
